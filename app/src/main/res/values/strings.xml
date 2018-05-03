@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">BakingApp</string>
+
+    <string name="error_message">
+        Failed to get results. Please try again.
+    </string>
+
+    <string name="recipe_name">Recipe Title Name</string>
+    <string name="recipe_image">Recipe Image</string>
+
+</resources>
