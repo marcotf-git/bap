@@ -31,7 +31,7 @@ public class RecipeslistDbHelper extends SQLiteOpenHelper {
                 RecipeslistEntry.COLUMN_RECIPE_INGREDIENTS_JSON + " TEXT," +
                 RecipeslistEntry.COLUMN_RECIPE_STEPS_JSON + " TEXT," +
                 RecipeslistEntry.COLUMN_RECIPE_SERVINGS + " INTEGER," +
-                RecipeslistEntry.COLUMN_RECIPE_IMAGE + " BLOB," +
+                RecipeslistEntry.COLUMN_RECIPE_IMAGE + " TEXT," +
                 /*
                  * To ensure this table can only contain one recipe id, we declare
                  * the id column to be unique. We also specify "ON CONFLICT REPLACE". This tells
