@@ -15,7 +15,7 @@
             android:name=".data.RecipeContentProvider"
             android:exported="false" />
 
-        <activity android:name=".utilities.MainActivity">
+        <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
