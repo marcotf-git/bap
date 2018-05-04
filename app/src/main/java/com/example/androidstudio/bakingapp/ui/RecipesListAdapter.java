@@ -1,7 +1,6 @@
 package com.example.androidstudio.bakingapp.ui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,10 +39,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      * with the MainActivity).
      */
     public interface ListItemClickListener {
-        void onListItemClick(int clickedItemIndex,
-                             String recipeInfoStringJSON,
-                             String recipeIngredientsStringJSON,
-                             String recipeStepsStringJSON);
+        void onListItemClick(int clickedItemIndex, String recipeStringJSON);
     }
 
     /**
@@ -88,8 +84,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         RecipeViewHolder viewHolder = new RecipeViewHolder(view);
 
         viewHolderCount++;
-        Log.d(TAG, "onCreateViewHolder: number of ViewHolders created: "
-                + viewHolderCount);
+        Log.d(TAG, "onCreateViewHolder: number of ViewHolders created: " + viewHolderCount);
 
         return viewHolder;
     }
@@ -180,21 +175,16 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         @Override
         public void onClick(View v) {
 
-                Log.v(TAG, "onClick");
-                int clickedPosition = getAdapterPosition();
+            int clickedPosition = getAdapterPosition();
 
-                JSONObject recipeJSON;
-                recipeJSON = recipesBox.getRecipeJSON(clickedPosition);
+            JSONObject recipeJSON;
+            recipeJSON = recipesBox.getRecipeJSON(clickedPosition);
 
-                mOnClickListener.onListItemClick(
-                        clickedPosition,
-                        recipeJSON.toString(),
-                        "",
-                        "");
+            Log.v(TAG, "onClick recipeJSON:" + recipeJSON.toString());
 
-                Log.v(TAG, "onClick movieJSON:" + recipeJSON.toString());
-
+            mOnClickListener.onListItemClick(clickedPosition, recipeJSON.toString());
         }
+
     }
 
 }

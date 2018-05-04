@@ -23,8 +23,9 @@ import java.io.IOException;
 
 
 public class MainActivity extends AppCompatActivity
-        implements RecipesListAdapter.ListItemClickListener,
-        LoaderManager.LoaderCallbacks<String>{
+        implements  RecipesListAdapter.ListItemClickListener,
+                    LoaderManager.LoaderCallbacks<String>{
+
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -37,8 +38,10 @@ public class MainActivity extends AppCompatActivity
     private RecipesListAdapter mAdapter;
     private RecyclerView mRecipesList;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -50,7 +53,6 @@ public class MainActivity extends AppCompatActivity
          * do things like set the adapter of the RecyclerView and toggle the visibility.
          */
         mRecipesList = findViewById(R.id.rv_recipes);
-
 
         /*
          * A LinearLayoutManager is responsible for measuring and positioning item views within a
@@ -81,14 +83,12 @@ public class MainActivity extends AppCompatActivity
         mAdapter = new RecipesListAdapter(this);
         mRecipesList.setAdapter(mAdapter);
 
-
-
+        // Loads the recipes in the adapter
         int loaderId = RECIPES_LOADER_FROM_FILE_ID;
         LoaderManager.LoaderCallbacks<String> callback = MainActivity.this;
         Bundle bundleForLoader = null;
 
         getSupportLoaderManager().initLoader(loaderId, bundleForLoader, callback);
-
 
     }
 
@@ -163,36 +163,26 @@ public class MainActivity extends AppCompatActivity
 
     // When the load is finished, show either the data or an error message if there is no data.
     @Override
-    public void onLoadFinished(Loader<String> loader, String recipesJSONString) {
+    public void onLoadFinished(Loader<String> loader, String recipesStringJSON) {
 
         Log.v("onLoadFinished", "loader id:" + loader.getId());
 
-        Log.v(TAG, "onLoadFinished recipesJSONString:" + recipesJSONString);
-        Log.v(TAG, "onLoadFinished recipesJSONString size:" + recipesJSONString.length());
+        Log.v(TAG, "onLoadFinished recipesJSONString:" + recipesStringJSON);
+        Log.v(TAG, "onLoadFinished recipesJSONString size:" + recipesStringJSON.length());
 
         mLoadingIndicator.setVisibility(View.INVISIBLE);
 
-        if (recipesJSONString != null && !recipesJSONString.equals("")) {
-//            showMoviesDataView();
-//            MoviesBox moviesBox = new MoviesBox(themoviedbSearchResults);
-//            mAdapter.setMoviesHttpQueryData(moviesBox);
-//
-//            // This will restore the state of the recycler view, only in case of the screen rotation.
-//            // If the user just updates the preferences, the state will not be restored.
-//            if (!flag_preferences_updates) {
-//                //mMoviesList.getLayoutManager().scrollToPosition(viewPosition);
-//                mMoviesList.getLayoutManager().onRestoreInstanceState(recyclerViewState);
-//            }
-//
-            showRecipesDataView();
-            RecipesBox recipesBox = new RecipesBox(recipesJSONString);
-            mAdapter.setRecipesData(recipesBox);
+        if (recipesStringJSON != null && !recipesStringJSON.equals("")) {
 
+            showRecipesDataView();
+            RecipesBox recipesBox = new RecipesBox(recipesStringJSON);
+            mAdapter.setRecipesData(recipesBox);
 
         } else {
             showErrorMessage();
         }
     }
+
 
     @Override
     public void onLoaderReset(Loader<String> loader) {
@@ -216,21 +206,17 @@ public class MainActivity extends AppCompatActivity
 
 
     /**
-     * This method will make the error message visible and hide the JSON
-     * View.
-     * <p>
+     * This method will make the error message visible and hide the JSON View.
+     *
      * Since it is okay to redundantly set the visibility of a View, we don't
      * need to check whether each view is currently visible or invisible.
      */
     private void showErrorMessage() {
         // First, hide the currently visible data
-        //mMoviesList.setVisibility(View.INVISIBLE);
+        mRecipesList.setVisibility(View.INVISIBLE);
         // Then, show the error
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
-
-
-
 
 
     /**
@@ -242,10 +228,7 @@ public class MainActivity extends AppCompatActivity
      * @param clickedItemIndex Index in the list of the item that was clicked.
      */
     @Override
-    public void onListItemClick(int clickedItemIndex,
-                                String recipeInfoStringJSON,
-                                String recipeIngredientsStringJSON,
-                                String recipeStepsStringJSON) {
+    public void onListItemClick(int clickedItemIndex, String recipeStringJSON) {
 
         Log.v(TAG, "onListItemClick clickedItemIndex:" + clickedItemIndex);
 
@@ -257,34 +240,31 @@ public class MainActivity extends AppCompatActivity
          */
         Context context = MainActivity.this;
 
-        /* This is the class that we want to start (and open) when the button is clicked. */
-        //Class destinationActivity = DetailActivity.class;
+        /* This is the class that we want to start (and open) when the item is clicked. */
+        Class destinationActivity = RecipeDetailActivity.class;
 
         /*
          * Here, we create the Intent that will start the Activity we specified above in
          * the destinationActivity variable. The constructor for an Intent also requires a
          * context, which we stored in the variable named "context".
          */
-        //Intent startChildActivityIntent = new Intent(context, destinationActivity);
+        Intent startChildActivityIntent = new Intent(context, destinationActivity);
 
         /*
          * We use the putExtra method of the Intent class to pass some extra stuff to the
          * Activity that we are starting. Generally, this data is quite simple, such as
          * a String or a number. However, there are ways to pass more complex objects.
          */
-//        startChildActivityIntent.putExtra("movieInfoStringJSON", movieInfoStringJSON);
-//        startChildActivityIntent.putExtra("movieTrailersStringJSON", movieTrailersStringJSON);
-//        startChildActivityIntent.putExtra("movieReviewsStringJSON", movieReviewsStringJSON);
-//        startChildActivityIntent.putExtra("showFavorites", showFavorites);
+        startChildActivityIntent.putExtra("recipeStringJSON", recipeStringJSON);
 
         /*
          * Once the Intent has been created, we can use Activity's method, "startActivity"
          * to start the DetailActivity.
          */
-        //startActivity(startChildActivityIntent);
-
+        startActivity(startChildActivityIntent);
 
     }
+
 
     // Helper method for calc the number of columns based on screen
     private int numberOfColumns() {

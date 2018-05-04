@@ -9,10 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <provider
-            android:authorities="com.example.androidstudio.bakingapp"
             android:name=".data.RecipeContentProvider"
+            android:authorities="com.example.androidstudio.bakingapp"
             android:exported="false" />
 
         <activity android:name=".ui.MainActivity">
@@ -22,7 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity android:name=".ui.RecipeDetailActivity"></activity>
     </application>
 
 </manifest>
