@@ -2,6 +2,7 @@ package com.example.androidstudio.bakingapp.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -126,23 +127,22 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
         }
 
-
         // At this point, we have an Array with the ingredients information
-        Log.v(TAG, "updateIngredientsView inredients:" + ingredients.toString());
+        Log.v(TAG, "updateIngredientsView ingredients:" + ingredients.toString());
 
-        // Set the adapter to show the array on the list view
-        IngredientAdapter ingredientAdapter = new IngredientAdapter(this, ingredients);
-        ListView listView = findViewById(R.id.ingredients_list);
-        listView.setAdapter(ingredientAdapter);
+        // Create a new IngredientsFragment instance and display it using the FragmentManager
+        IngredientsFragment ingredientsFragment = new IngredientsFragment();
 
-        // Adjust the size of the list view to show all the ingredients
-        float listItemHeight = getResources().getDimension(R.dimen.ingredient_list_item_height);
-        Log.v(TAG, " list item height:" + listItemHeight);
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        int totalHeight = Math.round(listItemHeight) * (ingredients.size());
-        params.height = totalHeight;
-        Log.v(TAG, " total list item height:" + totalHeight);
-        listView.setLayoutParams(params);
+        // Set the fragment data
+        ingredientsFragment.setIngredients(ingredients);
+
+        // Use a FragmentManager and transaction to add the fragment to the screen
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        // Fragment transaction
+        fragmentManager.beginTransaction()
+                .add(R.id.ingredients_container, ingredientsFragment)
+                .commit();
 
     }
 
@@ -185,37 +185,51 @@ public class RecipeDetailActivity extends AppCompatActivity {
         // At this point, we have an Array with the steps information
         Log.v(TAG, "updateStepsView steps:" + steps.toString());
 
-        // Set the adapter to show the array on the list view
-        StepAdapter stepAdapter = new StepAdapter(this, steps);
-        ListView listView = findViewById(R.id.steps_list);
-        listView.setAdapter(stepAdapter);
+//        // Set the adapter to show the array on the list view
+//        StepAdapter stepAdapter = new StepAdapter(this, steps);
+//        ListView listView = findViewById(R.id.steps_list);
+//        listView.setAdapter(stepAdapter);
+//
+//        // Adjust the size of the list view to show all the ingredients
+//        float listItemHeight = getResources().getDimension(R.dimen.step_list_item_height);
+//        Log.v(TAG, " list item height:" + listItemHeight);
+//        ViewGroup.LayoutParams params = listView.getLayoutParams();
+//        int totalHeight = Math.round(listItemHeight) * (steps.size());
+//        params.height = totalHeight;
+//        Log.v(TAG, " total list item height:" + totalHeight);
+//        listView.setLayoutParams(params);
 
-        // Adjust the size of the list view to show all the ingredients
-        float listItemHeight = getResources().getDimension(R.dimen.step_list_item_height);
-        Log.v(TAG, " list item height:" + listItemHeight);
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        int totalHeight = Math.round(listItemHeight) * (steps.size());
-        params.height = totalHeight;
-        Log.v(TAG, " total list item height:" + totalHeight);
-        listView.setLayoutParams(params);
 
+        // Create a new IngredientsFragment instance and display it using the FragmentManager
+        StepsFragment stepsFragment = new StepsFragment();
 
-        // Set listener to show step description
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        // Set the fragment data
+        stepsFragment.setSteps(steps);
 
-                Step step = steps.get(position);
+        // Use a FragmentManager and transaction to add the fragment to the screen
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
-                Context context = RecipeDetailActivity.this;
-                Class destinationActivity = StepDetailActivity.class;
-                Intent startChildActivityIntent = new Intent(context, destinationActivity);
+        // Fragment transaction
+        fragmentManager.beginTransaction()
+                .add(R.id.steps_container, stepsFragment)
+                .commit();
 
-                startChildActivityIntent.putExtra("stepDescription", step.getDescription());
-
-                startActivity(startChildActivityIntent);
-            }
-        });
+//        // Set listener to show step description
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//                Step step = steps.get(position);
+//
+//                Context context = RecipeDetailActivity.this;
+//                Class destinationActivity = StepDetailActivity.class;
+//                Intent startChildActivityIntent = new Intent(context, destinationActivity);
+//
+//                startChildActivityIntent.putExtra("stepDescription", step.getDescription());
+//
+//                startActivity(startChildActivityIntent);
+//            }
+//        });
 
 
 
