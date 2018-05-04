@@ -5,12 +5,15 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
 import com.example.androidstudio.bakingapp.utilities.Ingredient;
+import com.example.androidstudio.bakingapp.utilities.Step;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +35,9 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
     // The array for storing information about the ingredients
     private final ArrayList<Ingredient> ingredients = new ArrayList<>();
+
+    // The array for storing information about the steps
+    private final ArrayList<Step> steps = new ArrayList<>();
 
 
 
@@ -72,10 +78,11 @@ public class RecipeDetailActivity extends AppCompatActivity {
             // Update views
             mDisplayName.setText(recipeName);
 
-
             JSONArray ingredientsJSON = recipeJSON.getJSONArray("ingredients");
-
             updateIngredientsView(ingredientsJSON);
+
+            JSONArray stepsJSON = recipeJSON.getJSONArray("steps");
+            updateStepsView(stepsJSON);
 
 
         } catch (JSONException e) {
@@ -137,9 +144,82 @@ public class RecipeDetailActivity extends AppCompatActivity {
         Log.v(TAG, " total list item height:" + totalHeight);
         listView.setLayoutParams(params);
 
-
     }
 
+
+    public void updateStepsView (JSONArray stepsJSON) {
+
+        Log.v(TAG, "updateStepsView stepsJSON:" + stepsJSON.toString());
+
+        int nSteps = stepsJSON.length();
+
+
+        // Create an ArrayList with the ingredients for the recipe
+        for (int i = 0; i < nSteps; i++) {
+
+            int id;
+            String shortDescription;
+            String description;
+
+            JSONObject jsonObject;
+
+            try {
+
+                jsonObject = stepsJSON.getJSONObject(i);
+
+                id = jsonObject.getInt("id");
+                shortDescription = jsonObject.getString("shortDescription");
+                description = jsonObject.getString("description");
+
+                Step step = new Step(id, shortDescription, description, "", "");
+
+                steps.add(step);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+
+        // At this point, we have an Array with the steps information
+        Log.v(TAG, "updateStepsView steps:" + steps.toString());
+
+        // Set the adapter to show the array on the list view
+        StepAdapter stepAdapter = new StepAdapter(this, steps);
+        ListView listView = findViewById(R.id.steps_list);
+        listView.setAdapter(stepAdapter);
+
+        // Adjust the size of the list view to show all the ingredients
+        float listItemHeight = getResources().getDimension(R.dimen.step_list_item_height);
+        Log.v(TAG, " list item height:" + listItemHeight);
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        int totalHeight = Math.round(listItemHeight) * (steps.size());
+        params.height = totalHeight;
+        Log.v(TAG, " total list item height:" + totalHeight);
+        listView.setLayoutParams(params);
+
+
+        // Set listener to show step description
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Step step = steps.get(position);
+
+                Context context = RecipeDetailActivity.this;
+                Class destinationActivity = StepDetailActivity.class;
+                Intent startChildActivityIntent = new Intent(context, destinationActivity);
+
+                startChildActivityIntent.putExtra("stepDescription", step.getDescription());
+
+                startActivity(startChildActivityIntent);
+            }
+        });
+
+
+
+    }
 
 
 

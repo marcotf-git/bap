@@ -1,4 +1,5 @@
 <resources>
+
     <string name="app_name">BakingApp</string>
 
     <string name="error_message">
@@ -8,5 +9,7 @@
     <string name="recipe_name">Recipe Name</string>
     <string name="recipe_image">Recipe Image</string>
     <string name="ingredients">Ingredients</string>
+    <string name="steps">Steps</string>
+    <string name="step_description">Step Description</string>
 
 </resources>
