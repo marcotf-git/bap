@@ -3,8 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.StepDetailActivity">
+    android:layout_height="wrap_content"
+    tools:context=".ui.StepDetailActivity"
+    android:id="@+id/sv_fragment_step_detail">
 
     <TextView
         android:id="@+id/tv_step_description"

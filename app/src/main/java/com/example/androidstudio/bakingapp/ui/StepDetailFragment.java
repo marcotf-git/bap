@@ -2,6 +2,7 @@ package com.example.androidstudio.bakingapp.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +28,10 @@ public class StepDetailFragment extends Fragment {
     private String videoURL;
     private String thumbnailURL;
 
+    // Final Strings to store state information
+    public static final String STEP_DESCRIPTION = "description";
+
+
     // References to the view
     private TextView mDisplayStepDescription;
 
@@ -40,6 +45,10 @@ public class StepDetailFragment extends Fragment {
       */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        if(savedInstanceState != null) {
+            description = savedInstanceState.getString(STEP_DESCRIPTION);
+        }
 
         // Inflate the Steps fragment layout
         View rootView = inflater.inflate(R.layout.fragment_step_detail, container, false);
@@ -70,5 +79,11 @@ public class StepDetailFragment extends Fragment {
 
     public void setThumbnailURL(String thumbnailURL) {
         this.thumbnailURL = thumbnailURL;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putString(STEP_DESCRIPTION, description);
+        super.onSaveInstanceState(outState);
     }
 }
