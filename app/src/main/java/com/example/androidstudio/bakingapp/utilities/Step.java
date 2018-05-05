@@ -1,5 +1,7 @@
 package com.example.androidstudio.bakingapp.utilities;
 
+import android.os.Bundle;
+
 public class Step {
 
     private int mId;
@@ -36,4 +38,5 @@ public class Step {
     public String getThumbnailURL() {
         return mThumbnailURL;
     }
+
 }

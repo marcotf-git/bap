@@ -6,5 +6,6 @@
     <dimen name="ingredient_list_item_height">56dp</dimen>
     <dimen name="step_list_item_height">56dp</dimen>
     <dimen name="step_text_size">16sp</dimen>
+    <dimen name="list_padding">8dp</dimen>
 
 </resources>

@@ -19,7 +19,7 @@ public class IngredientsFragment extends Fragment {
 
     private static final String TAG = IngredientsFragment.class.getSimpleName();
 
-
+    // Variables to store resources that this fragment displays
     // The array for storing information about the ingredients
     private final ArrayList<Ingredient> mIngredients = new ArrayList<>();
 
@@ -46,9 +46,10 @@ public class IngredientsFragment extends Fragment {
 
         // Adjust the size of the list view to show all the ingredients
         float listItemHeight = getResources().getDimension(R.dimen.ingredient_list_item_height);
+        float listItemPadding = getResources().getDimension(R.dimen.list_padding);
         Log.v(TAG, " list item height:" + listItemHeight);
         ViewGroup.LayoutParams params = listView.getLayoutParams();
-        int totalHeight = Math.round(listItemHeight) * (mIngredients.size());
+        int totalHeight = Math.round((listItemHeight * mIngredients.size())+ listItemPadding);
         params.height = totalHeight;
         Log.v(TAG, " total list item height:" + totalHeight);
         listView.setLayoutParams(params);
