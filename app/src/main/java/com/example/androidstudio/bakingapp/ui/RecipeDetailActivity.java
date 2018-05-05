@@ -47,7 +47,7 @@ public class RecipeDetailActivity extends AppCompatActivity
 
         Intent intentThatStartedThisActivity = getIntent();
 
-        if(intentThatStartedThisActivity.hasExtra("recipeStringJSON")){
+        if (intentThatStartedThisActivity.hasExtra("recipeStringJSON")) {
 
             recipeStringJSON = intentThatStartedThisActivity.getStringExtra("recipeStringJSON");
             updateView(recipeStringJSON);
