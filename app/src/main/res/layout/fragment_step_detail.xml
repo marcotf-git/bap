@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.StepDetailActivity"
     android:id="@+id/sv_fragment_step_detail">
+
+    <TextView
+        android:id="@+id/tv_step_description_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/step_description"
+        android:padding="16dp"
+        android:textSize="@dimen/step_text_size"
+        android:text="@string/step_description"/>
 
     <TextView
         android:id="@+id/tv_step_description"
@@ -15,4 +25,4 @@
         android:padding="16dp"
         android:textSize="@dimen/step_text_size" />
 
-</ScrollView>
+</LinearLayout>

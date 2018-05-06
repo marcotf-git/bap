@@ -36,12 +36,23 @@ public class RecipeDetailActivity extends AppCompatActivity
     // The array for storing information about the steps
     private final ArrayList<Step> steps = new ArrayList<>();
 
+        // A single-pane display refers to phone screens, and two-pane to tablet screens
+    private boolean mTwopane;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
+
+        // Determine if you are creating a two-pane or single-pane display
+        if(findViewById(R.id.view_tablet_linear_layout) != null) {
+            // this LinearLayout will only initially exists in the two-pane tablet case
+            mTwopane = true;
+        } else {
+            mTwopane = false;
+        }
 
         mDisplayName = findViewById(R.id.tv_recipe_name);
 
@@ -50,14 +61,14 @@ public class RecipeDetailActivity extends AppCompatActivity
         if (intentThatStartedThisActivity.hasExtra("recipeStringJSON")) {
 
             recipeStringJSON = intentThatStartedThisActivity.getStringExtra("recipeStringJSON");
-            updateView(recipeStringJSON);
+            updateView(recipeStringJSON, savedInstanceState);
 
         }
 
     }
 
 
-    public void updateView(String recipeStringJSON){
+    public void updateView(String recipeStringJSON, Bundle savedState){
 
         try {
 
@@ -74,7 +85,7 @@ public class RecipeDetailActivity extends AppCompatActivity
             updateIngredientsView(ingredientsJSON);
 
             JSONArray stepsJSON = recipeJSON.getJSONArray("steps");
-            updateStepsView(stepsJSON);
+            updateStepsView(stepsJSON, savedState);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -140,7 +151,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     /**
      * This helper function will load the StepsFragment, to show the steps in a list
      */
-    public void updateStepsView (JSONArray stepsJSON) {
+    public void updateStepsView (JSONArray stepsJSON, Bundle savedState) {
 
         Log.v(TAG, "updateStepsView stepsJSON:" + stepsJSON.toString());
 
@@ -192,7 +203,30 @@ public class RecipeDetailActivity extends AppCompatActivity
         fragmentManager.beginTransaction()
                 .add(R.id.steps_container, stepsFragment)
                 .commit();
+
+
+        // If two-pane screen, show the container with the initial step detail fragment
+        if (mTwopane && (savedState == null)) {
+
+            // Create a new StepDetailFragment instance and display it using the FragmentManager
+            StepDetailFragment stepDetailFragment = new StepDetailFragment();
+
+            // Set the fragment data
+            stepDetailFragment.setDescription(steps.get(0).getDescription());
+
+            // Use a FragmentManager and transaction to add the fragment to the screen
+            FragmentManager stepFragmentManager = getSupportFragmentManager();
+
+            // Fragment transaction
+            stepFragmentManager.beginTransaction()
+                    .add(R.id.step_detail_container, stepDetailFragment)
+                    .commit();
+
+        }
+
     }
+
+
 
 
     /**
@@ -201,9 +235,6 @@ public class RecipeDetailActivity extends AppCompatActivity
     @Override
     public void onStepSelected(int position) {
 
-
-        // Call the StepDetailActivity to show the step detail
-
         //Toast.makeText(this, "Position= " + position, Toast.LENGTH_SHORT).show();
         Log.v(TAG, "onStepSelected:" + position);
 
@@ -211,35 +242,41 @@ public class RecipeDetailActivity extends AppCompatActivity
 
         Context context = RecipeDetailActivity.this;
 
-        Class destinationActivity = StepDetailActivity.class;
-        Intent startChildActivityIntent = new Intent(context, destinationActivity);
 
-        startChildActivityIntent.putExtra("id", step.getId());
-        startChildActivityIntent.putExtra("shortDescription", step.getShortDescription());
-        startChildActivityIntent.putExtra("description", step.getDescription());
-        startChildActivityIntent.putExtra("videoURL", step.getVideoURL());
-        startChildActivityIntent.putExtra("thumbnailURL", step.getThumbnailURL());
+        if (!mTwopane) {
 
-        startActivity(startChildActivityIntent);
+            // If one-pane screen, call the StepDetailActivity to show the step detail
 
+            Class destinationActivity = StepDetailActivity.class;
+            Intent startChildActivityIntent = new Intent(context, destinationActivity);
 
+            startChildActivityIntent.putExtra("id", step.getId());
+            startChildActivityIntent.putExtra("shortDescription", step.getShortDescription());
+            startChildActivityIntent.putExtra("description", step.getDescription());
+            startChildActivityIntent.putExtra("videoURL", step.getVideoURL());
+            startChildActivityIntent.putExtra("thumbnailURL", step.getThumbnailURL());
 
-        // Updates the container with the step detail fragment
+            startActivity(startChildActivityIntent);
 
-//        // Create a new StepDetailFragment instance and display it using the FragmentManager
-//        StepDetailFragment stepDetailFragment = new StepDetailFragment();
-//
-//        // Set the fragment data
-//        stepDetailFragment.setDescription(step.getDescription());
-//
-//        // Use a FragmentManager and transaction to add the fragment to the screen
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//
-//        // Fragment transaction
-//        fragmentManager.beginTransaction()
-//                .add(R.id.step_detail, stepDetailFragment)
-//                .commit();
+        } else {
 
+                // If two-pane screen, update the container with the step detail fragment
+
+                // Create a new StepDetailFragment instance and display it using the FragmentManager
+                StepDetailFragment stepDetailFragment = new StepDetailFragment();
+
+                // Set the fragment data
+                stepDetailFragment.setDescription(step.getDescription());
+
+                // Use a FragmentManager and transaction to add the fragment to the screen
+                FragmentManager fragmentManager = getSupportFragmentManager();
+
+                // Fragment transaction
+                fragmentManager.beginTransaction()
+                        .replace(R.id.step_detail_container, stepDetailFragment)
+                        .commit();
+
+        }
 
     }
 }
