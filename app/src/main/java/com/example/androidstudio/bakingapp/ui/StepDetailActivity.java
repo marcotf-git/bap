@@ -1,9 +1,9 @@
 package com.example.androidstudio.bakingapp.ui;
 
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -11,20 +11,26 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.example.androidstudio.bakingapp.R;
 import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
@@ -32,18 +38,21 @@ import com.google.android.exoplayer2.util.Util;
  * This activity has the function of starting the step detail fragment
  */
 public class StepDetailActivity extends AppCompatActivity
-    implements ExoPlayer.EventListener{
+    implements Player.EventListener{
 
     private static final String TAG = StepDetailActivity.class.getSimpleName();
 
     // For the player
     private SimpleExoPlayer mExoPlayer;
-    private SimpleExoPlayerView mPlayerView;
+    private PlayerView mPlayerView;
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
-    private NotificationManager mNotificationManager;
 
     private String videoURL;
+
+    // Fields for handling the saving and restoring of view state
+    private static final String EXOPLAYER_VIEW_STATE = "exoplayerViewState";
+    private Parcelable exoplayerViewState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +84,6 @@ public class StepDetailActivity extends AppCompatActivity
                 stepDetailFragment.setDescription("No step description available.");
             }
 
-
-
             if (intentThatStartedThisActivity.hasExtra("thumbnailURL")) {
                 stepDetailFragment.setThumbnailURL(intentThatStartedThisActivity.getStringExtra("thumbnailURL"));
             } else {
@@ -91,15 +98,13 @@ public class StepDetailActivity extends AppCompatActivity
             fragmentManager.beginTransaction()
                     .add(R.id.step_detail_container, stepDetailFragment)
                     .commit();
-
-
         }
 
         // Initialize the Media Session.
         initializeMediaSession();
 
         // Initialize the player view.
-        mPlayerView = (SimpleExoPlayerView) findViewById(R.id.playerView);
+        mPlayerView = (PlayerView) findViewById(R.id.playerView);
 
         if (videoURL != null) {
             // Initialize the player.
@@ -146,6 +151,64 @@ public class StepDetailActivity extends AppCompatActivity
     }
 
 
+    @Override
+    public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
+
+    }
+
+    @Override
+    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+
+    }
+
+    @Override
+    public void onLoadingChanged(boolean isLoading) {
+
+    }
+
+    @Override
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        if((playbackState == Player.STATE_READY) && playWhenReady){
+            mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
+                    mExoPlayer.getCurrentPosition(), 1f);
+        } else if((playbackState == Player.STATE_READY)){
+            mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
+                    mExoPlayer.getCurrentPosition(), 1f);
+        }
+        mMediaSession.setPlaybackState(mStateBuilder.build());
+    }
+
+    @Override
+    public void onRepeatModeChanged(int repeatMode) {
+
+    }
+
+    @Override
+    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+
+    }
+
+    @Override
+    public void onPlayerError(ExoPlaybackException error) {
+
+    }
+
+    @Override
+    public void onPositionDiscontinuity(int reason) {
+
+    }
+
+    @Override
+    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+
+    }
+
+    @Override
+    public void onSeekProcessed() {
+
+    }
+
+
     /**
      * Media Session Callbacks, where all external clients control the player.
      */
@@ -176,10 +239,19 @@ public class StepDetailActivity extends AppCompatActivity
         if (mExoPlayer == null) {
             // Create an instance of the ExoPlayer.
 
+            // Measures bandwidth during playback. Can be null if not required.
+            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
             // Create a default TrackSelector
-            TrackSelector trackSelector = new DefaultTrackSelector();
+            TrackSelection.Factory videoTrackSelectionFactory =
+                    new AdaptiveTrackSelection.Factory(bandwidthMeter);
+            TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+            // Load Control
             LoadControl loadControl = new DefaultLoadControl();
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
+            // Renderer
+            DefaultRenderersFactory renderersFactory = new DefaultRenderersFactory(this);
+
+            // Create a new ExoPlayer instance
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector, loadControl);
 
             // Attach the player to the view
             mPlayerView.setPlayer(mExoPlayer);
@@ -189,14 +261,21 @@ public class StepDetailActivity extends AppCompatActivity
 
             // Prepare the MediaSource.
             String userAgent = Util.getUserAgent(this, "BakingApp");
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
-                    this, userAgent), new DefaultExtractorsFactory(), null, null);
-            mExoPlayer.prepare(mediaSource);
 
+            // Produces DataSource instances through which media data is loaded.
+            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, userAgent);
+            MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(mediaUri);
+
+            // Attach the media source
+            mExoPlayer.prepare(videoSource);
+
+            // Set the player to begin playing
             mExoPlayer.setPlayWhenReady(true);
         }
 
     }
+
 
     /**
      * Release ExoPlayer.
@@ -208,59 +287,6 @@ public class StepDetailActivity extends AppCompatActivity
     }
 
 
-
-
-    @Override
-    public void onTimelineChanged(Timeline timeline, Object manifest) {
-
-    }
-
-    @Override
-    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
-    }
-
-    @Override
-    public void onLoadingChanged(boolean isLoading) {
-
-    }
-
-    /**
-     * Method that is called when the ExoPlayer state changes. Used to update the MediaSession
-     * PlayBackState to keep in sync, and post the media notification.
-     * @param playWhenReady true if ExoPlayer is playing, false if it's paused.
-     * @param playbackState int describing the state of ExoPlayer. Can be STATE_READY, STATE_IDLE,
-     *                      STATE_BUFFERING, or STATE_ENDED.
-     */
-    @Override
-    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        if((playbackState == ExoPlayer.STATE_READY) && playWhenReady){
-            mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
-                    mExoPlayer.getCurrentPosition(), 1f);
-        } else if((playbackState == ExoPlayer.STATE_READY)){
-            mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
-                    mExoPlayer.getCurrentPosition(), 1f);
-        }
-        mMediaSession.setPlaybackState(mStateBuilder.build());
-    }
-
-    @Override
-    public void onPlayerError(ExoPlaybackException error) {
-
-    }
-
-    @Override
-    public void onPositionDiscontinuity() {
-
-    }
-
-    // Release the player when activity is paused
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        releasePlayer();
-//    }
-
     // Release the player when activity is destroyed
     @Override
     protected void onDestroy() {
@@ -269,4 +295,22 @@ public class StepDetailActivity extends AppCompatActivity
             releasePlayer();
         }
     }
+
+    // This method is saving the position of the recycler view
+//    @Override
+//    public void onSaveInstanceState(Bundle savedInstanceState) {
+//        Parcelable exoplayerViewState = mPlayerView.getMeasuredState();
+//        savedInstanceState.putParcelable(EXOPLAYER_VIEW_STATE, recyclerViewState);
+//        super.onSaveInstanceState(savedInstanceState);
+//    }
+
+    // This method is loading the saved position of the recycler view
+    // There is also a call on the post execute method in the loader, for updating the view
+//    @Override
+//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        exoplayerViewState = savedInstanceState.getParcelable(EXOPLAYER_VIEW_STATE);
+//        mPlayerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+//    }
+
 }
