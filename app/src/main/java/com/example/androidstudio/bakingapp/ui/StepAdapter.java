@@ -11,7 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
-import com.example.androidstudio.bakingapp.utilities.Ingredient;
 import com.example.androidstudio.bakingapp.utilities.Step;
 
 import java.util.ArrayList;
@@ -38,8 +37,8 @@ public class StepAdapter extends ArrayAdapter<Step> {
         // Get the {@link Word} object located at this position in the list
         Step currentStep = getItem(position);
 
-        TextView idView = listItemView.findViewById(R.id.tv_step_id);
-        TextView shortDescriptionTextView = listItemView.findViewById(R.id.tv_step_short_description);
+        TextView idView = (TextView) listItemView.findViewById(R.id.tv_step_id);
+        TextView shortDescriptionTextView = (TextView) listItemView.findViewById(R.id.tv_step_short_description);
 
         if (null != currentStep) {
 

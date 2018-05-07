@@ -54,7 +54,7 @@ public class RecipeDetailActivity extends AppCompatActivity
             mTwopane = false;
         }
 
-        mDisplayName = findViewById(R.id.tv_recipe_name);
+        mDisplayName = (TextView) findViewById(R.id.tv_recipe_name);
 
         Intent intentThatStartedThisActivity = getIntent();
 

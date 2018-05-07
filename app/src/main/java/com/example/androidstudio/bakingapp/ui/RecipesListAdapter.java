@@ -80,7 +80,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
 
-        View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
+        View view = (View) inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
         RecipeViewHolder viewHolder = new RecipeViewHolder(view);
 
         viewHolderCount++;
@@ -161,8 +161,8 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
             super(itemView);
 
             context = itemView.getContext();
-            recipeImageView = itemView.findViewById(R.id.iv_main_recipe_image);
-            recipeTextView = itemView.findViewById(R.id.tv_main_recipe_image);
+            recipeImageView = (ImageView) itemView.findViewById(R.id.iv_main_recipe_image);
+            recipeTextView = (TextView) itemView.findViewById(R.id.tv_main_recipe_image);
 
             // Call setOnClickListener on the View passed into the constructor (use 'this' as the OnClickListener)
             itemView.setOnClickListener(this);

@@ -35,7 +35,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:focusableInTouchMode="true"
-                android:focusedByDefault="true"
                 android:paddingBottom="8dp"
                 android:textSize="@dimen/recipe_name_text_size"
                 android:hint="@string/recipe_name" />

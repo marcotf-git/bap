@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.StepDetailActivity"
-    android:id="@+id/sv_fragment_step_detail">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/tv_step_description_label"
@@ -15,14 +13,27 @@
         android:hint="@string/step_description"
         android:padding="16dp"
         android:textSize="@dimen/step_text_size"
-        android:text="@string/step_description"/>
+        android:text="@string/step_description"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"/>
 
-    <TextView
-        android:id="@+id/tv_step_description"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/step_description"
-        android:padding="16dp"
-        android:textSize="@dimen/step_text_size" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.StepDetailActivity"
+        android:id="@+id/sv_fragment_step_detail">
+
+        <TextView
+            android:id="@+id/tv_step_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/step_description"
+            android:padding="16dp"
+            android:textSize="@dimen/step_text_size"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"/>
+
+    </ScrollView>
 
 </LinearLayout>

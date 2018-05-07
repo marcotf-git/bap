@@ -12,4 +12,11 @@
     <string name="steps">Steps</string>
     <string name="step_description">Step Description</string>
 
+    <string name="notification_text">Press play to hear the piece!</string>
+    <string name="sample_list_load_error">Error loading one or more samples!</string>
+    <string name="sample_not_found_error">Sample not found!</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="restart">Restart</string>
+
 </resources>

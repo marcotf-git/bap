@@ -1,20 +1,15 @@
 package com.example.androidstudio.bakingapp.ui;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
-
 import com.example.androidstudio.bakingapp.R;
-import com.example.androidstudio.bakingapp.utilities.Step;
 
-import java.util.ArrayList;
 
 
 public class StepDetailFragment extends Fragment {
@@ -36,6 +31,8 @@ public class StepDetailFragment extends Fragment {
     private TextView mDisplayStepDescription;
 
 
+    private Context context;
+
     // Mandatory constructor for instantiating the fragment
     public StepDetailFragment() {
     }
@@ -46,6 +43,8 @@ public class StepDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        context = getContext();
+
         if(savedInstanceState != null) {
             description = savedInstanceState.getString(STEP_DESCRIPTION);
         }
@@ -53,7 +52,7 @@ public class StepDetailFragment extends Fragment {
         // Inflate the Steps fragment layout
         View rootView = inflater.inflate(R.layout.fragment_step_detail, container, false);
 
-        mDisplayStepDescription = rootView.findViewById(R.id.tv_step_description);
+        mDisplayStepDescription = (TextView) rootView.findViewById(R.id.tv_step_description);
         mDisplayStepDescription.setText(description);
 
         // Return root view
@@ -86,4 +85,6 @@ public class StepDetailFragment extends Fragment {
         outState.putString(STEP_DESCRIPTION, description);
         super.onSaveInstanceState(outState);
     }
+
+
 }
