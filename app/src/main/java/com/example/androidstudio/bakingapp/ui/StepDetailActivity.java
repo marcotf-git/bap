@@ -8,6 +8,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.example.androidstudio.bakingapp.R;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -33,6 +36,8 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 /***
  * This activity has the function of starting the step detail fragment
@@ -48,7 +53,11 @@ public class StepDetailActivity extends AppCompatActivity
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
 
+    // For the thumbnail
+    private ImageView thumbnailView;
+
     private String videoURL;
+    private String thumbnailURL;
 
     // Fields for handling the saving and restoring of view state
     private static final String EXOPLAYER_VIEW_STATE = "exoplayerViewState";
@@ -60,6 +69,10 @@ public class StepDetailActivity extends AppCompatActivity
         setContentView(R.layout.activity_step_detail);
 
         Intent intentThatStartedThisActivity = getIntent();
+
+        if (intentThatStartedThisActivity.hasExtra("thumbnailURL")) {
+            thumbnailURL = intentThatStartedThisActivity.getStringExtra("thumbnailURL");
+        }
 
         if (intentThatStartedThisActivity.hasExtra("videoURL")) {
             videoURL = intentThatStartedThisActivity.getStringExtra("videoURL");
@@ -84,12 +97,6 @@ public class StepDetailActivity extends AppCompatActivity
                 stepDetailFragment.setDescription("No step description available.");
             }
 
-            if (intentThatStartedThisActivity.hasExtra("thumbnailURL")) {
-                stepDetailFragment.setThumbnailURL(intentThatStartedThisActivity.getStringExtra("thumbnailURL"));
-            } else {
-                stepDetailFragment.setThumbnailURL("");
-            }
-
 
             // Use a FragmentManager and transaction to add the fragment to the screen
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -106,9 +113,44 @@ public class StepDetailActivity extends AppCompatActivity
         // Initialize the player view.
         mPlayerView = (PlayerView) findViewById(R.id.playerView);
 
-        if (videoURL != null) {
+        // Initialize the thumbnail view
+        thumbnailView = (ImageView) findViewById(R.id.iv_thumbnail);
+
+
+        // Load the video
+        if (!videoURL.equals("")) {
+
+            Log.v(TAG, "videoURL:" + videoURL);
             // Initialize the player.
             initializePlayer(Uri.parse(videoURL));
+
+        } else {
+
+            mPlayerView.setVisibility(View.GONE);
+
+            // Show the thumbnail, if exists
+            if (!thumbnailURL.equals("")) {
+
+                Log.v(TAG, "thumbnailURL:" + thumbnailURL);
+                /*
+                 * Use the call back of picasso to manage the error in loading thumbnail.
+                 */
+                Picasso.with(this)
+                        .load(thumbnailURL)
+                        .into(thumbnailView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Log.v(TAG, "Thumbnail loaded");
+                                thumbnailView.setVisibility(View.VISIBLE);
+                            }
+
+                            @Override
+                            public void onError() {
+                                Log.e(TAG, "Error in loading thumbnail");
+                                thumbnailView.setVisibility(View.GONE);
+                            }
+                        });
+            }
         }
 
 
@@ -190,7 +232,7 @@ public class StepDetailActivity extends AppCompatActivity
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-
+        Log.e(TAG, "Error in ExoPlayer");
     }
 
     @Override
@@ -261,7 +303,6 @@ public class StepDetailActivity extends AppCompatActivity
 
             // Prepare the MediaSource.
             String userAgent = Util.getUserAgent(this, "BakingApp");
-
             // Produces DataSource instances through which media data is loaded.
             DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, userAgent);
             MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)

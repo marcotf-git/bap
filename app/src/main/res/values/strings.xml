@@ -11,6 +11,7 @@
     <string name="ingredients">Ingredients</string>
     <string name="steps">Steps</string>
     <string name="step_description">Step Description</string>
+    <string name="thumbnail_image">Thumbnail Image</string>
 
     <string name="notification_text">Press play to hear the piece!</string>
     <string name="sample_list_load_error">Error loading one or more samples!</string>
