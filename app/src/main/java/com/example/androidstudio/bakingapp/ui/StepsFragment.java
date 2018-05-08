@@ -82,29 +82,19 @@ public class StepsFragment extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 mCallback.onStepSelected(position);
-//                Step step = mSteps.get(position);
-//
-//                Class destinationActivity = StepDetailActivity.class;
-//                Intent startChildActivityIntent = new Intent(getContext(), destinationActivity);
-//
-//                startChildActivityIntent.putExtra("stepDescription", step.getDescription());
-//
-//                startActivity(startChildActivityIntent);
             }
         });
-
 
         // Return root view
         return rootView;
 
     }
 
+
     public void setSteps(ArrayList<Step> steps) {
+
         mSteps.addAll(steps);
     }
-
-
 
 }

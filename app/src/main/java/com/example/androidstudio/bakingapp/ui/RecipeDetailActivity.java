@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
 import com.example.androidstudio.bakingapp.utilities.Ingredient;
+import com.example.androidstudio.bakingapp.utilities.PlayerUtils;
 import com.example.androidstudio.bakingapp.utilities.Step;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -48,6 +49,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+
 public class RecipeDetailActivity extends AppCompatActivity
     implements StepsFragment.OnItemClickListener,
     Player.EventListener{
@@ -66,7 +68,6 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     // The array for storing information about the ingredients
     private final ArrayList<Ingredient> ingredients = new ArrayList<>();
-
     // The array for storing information about the steps
     private final ArrayList<Step> steps = new ArrayList<>();
 
@@ -103,12 +104,8 @@ public class RecipeDetailActivity extends AppCompatActivity
         mDisplayName = (TextView) findViewById(R.id.tv_recipe_name);
 
         if (mTwopane) {
-
-
-
             // Initialize the player view.
             mPlayerView = (PlayerView) findViewById(R.id.playerView);
-
             // Initialize the thumbnail view
             thumbnailView = (ImageView) findViewById(R.id.iv_thumbnail);
         }
@@ -131,10 +128,8 @@ public class RecipeDetailActivity extends AppCompatActivity
 
             // Convert the string to the JSON object
             JSONObject recipeJSON = new JSONObject(recipeStringJSON);
-
             // Extract the recipe name
             recipeName = recipeJSON.getString("name");
-
             // Update views
             mDisplayName.setText(recipeName);
 
@@ -191,13 +186,10 @@ public class RecipeDetailActivity extends AppCompatActivity
 
         // Create a new IngredientsFragment instance and display it using the FragmentManager
         IngredientsFragment ingredientsFragment = new IngredientsFragment();
-
         // Set the fragment data
         ingredientsFragment.setIngredients(ingredients);
-
         // Use a FragmentManager and transaction to add the fragment to the screen
         FragmentManager fragmentManager = getSupportFragmentManager();
-
         // Fragment transaction
         fragmentManager.beginTransaction()
                 .add(R.id.ingredients_container, ingredientsFragment)
@@ -249,15 +241,11 @@ public class RecipeDetailActivity extends AppCompatActivity
 
         // Create a new StepsFragment instance and display it using the FragmentManager
         StepsFragment stepsFragment = new StepsFragment();
-
         // Set the fragment data
         stepsFragment.setSteps(steps);
-
         // Use a FragmentManager and transaction to add the fragment to the screen
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        // Fragment transaction
-        fragmentManager.beginTransaction()
+        FragmentManager stepsFragmentManager = getSupportFragmentManager();
+        stepsFragmentManager.beginTransaction()
                 .add(R.id.steps_container, stepsFragment)
                 .commit();
 
@@ -272,72 +260,72 @@ public class RecipeDetailActivity extends AppCompatActivity
 
         Log.v(TAG, "updateStepsView mStep:" + mStep);
 
-        // If two-pane screen, show also the step detail fragment with the initial step
+        // If two-pane screen, show also the StepDetailFragment with the initial step
         if (mTwopane && (savedState == null)) {
-
             // Create a new StepDetailFragment instance and display it using the FragmentManager
             StepDetailFragment stepDetailFragment = new StepDetailFragment();
-
             // Set the fragment data
             stepDetailFragment.setDescription(steps.get(mStep).getDescription());
-
             // Use a FragmentManager and transaction to add the fragment to the screen
             FragmentManager stepFragmentManager = getSupportFragmentManager();
-
-            // Fragment transaction
             stepFragmentManager.beginTransaction()
                     .add(R.id.step_detail_container, stepDetailFragment)
                     .commit();
-
         }
 
 
-        // If two pane, show also the first video and thumbnail for initial step
-        if (mTwopane)  {
-
-            // Initialize the Media Session.
-            initializeMediaSession();
-
-            String videoURL = steps.get(mStep).getVideoURL();
-            String thumbnailURL = steps.get(mStep).getThumbnailURL();
-
-            // Load the video
-            if (!videoURL.equals("")) {
-
-                Log.v(TAG, "videoURL:" + videoURL);
-                // Initialize the player.
-                initializePlayer(Uri.parse(videoURL));
-
-            } else {
-
-                mPlayerView.setVisibility(View.GONE);
-
-                // Show the thumbnail, if exists
-                if (!thumbnailURL.equals("")) {
-
-                    Log.v(TAG, "thumbnailURL:" + thumbnailURL);
-                    /*
-                     * Use the call back of picasso to manage the error in loading thumbnail.
-                     */
-                    Picasso.with(this)
-                            .load(thumbnailURL)
-                            .into(thumbnailView, new Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    Log.v(TAG, "Thumbnail loaded");
-                                    thumbnailView.setVisibility(View.VISIBLE);
-                                }
-
-                                @Override
-                                public void onError() {
-                                    Log.e(TAG, "Error in loading thumbnail");
-                                    thumbnailView.setVisibility(View.GONE);
-                                }
-                            });
-                }
-            }
-
-        }
+//        // If two pane, show also the first video or thumbnail for initial step
+//        if (mTwopane)  {
+//
+//            // Initialize the Media Session.
+//            initializeMediaSession();
+//
+//            String videoURL = steps.get(mStep).getVideoURL();
+//            String thumbnailURL = steps.get(mStep).getThumbnailURL();
+//
+//            // Load the video
+//            if (!videoURL.equals("")) {
+//
+//                Log.v(TAG, "videoURL:" + videoURL);
+//                // Initialize the player.
+//                //initializePlayer(Uri.parse(videoURL));
+//
+//                //initializePlayer(Uri.parse(videoURL));
+//                mExoPlayer = PlayerUtils.initializePlayer(this, Uri.parse(videoURL), this);
+//
+//                // Attach the player to the view
+//                mPlayerView.setPlayer(mExoPlayer);
+//
+//            } else {
+//
+//                mPlayerView.setVisibility(View.GONE);
+//
+//                // Show the thumbnail, if exists
+//                if (!thumbnailURL.equals("")) {
+//
+//                    Log.v(TAG, "thumbnailURL:" + thumbnailURL);
+//                    /*
+//                     * Use the call back of picasso to manage the error in loading thumbnail.
+//                     */
+//                    Picasso.with(this)
+//                            .load(thumbnailURL)
+//                            .into(thumbnailView, new Callback() {
+//                                @Override
+//                                public void onSuccess() {
+//                                    Log.v(TAG, "Thumbnail loaded");
+//                                    thumbnailView.setVisibility(View.VISIBLE);
+//                                }
+//
+//                                @Override
+//                                public void onError() {
+//                                    Log.e(TAG, "Error in loading thumbnail");
+//                                    thumbnailView.setVisibility(View.GONE);
+//                                }
+//                            });
+//                }
+//            }
+//
+//        }
 
     }
 
@@ -379,13 +367,10 @@ public class RecipeDetailActivity extends AppCompatActivity
 
             // Create a new StepDetailFragment instance and display it using the FragmentManager
             StepDetailFragment stepDetailFragment = new StepDetailFragment();
-
             // Set the fragment data
             stepDetailFragment.setDescription(step.getDescription());
-
             // Use a FragmentManager and transaction to add the fragment to the screen
             FragmentManager fragmentManager = getSupportFragmentManager();
-
             // Fragment transaction
             fragmentManager.beginTransaction()
                     .replace(R.id.step_detail_container, stepDetailFragment)
@@ -408,8 +393,11 @@ public class RecipeDetailActivity extends AppCompatActivity
             if (!videoURL.equals("")) {
 
                 // Initialize the player.
-                initializePlayer(Uri.parse(videoURL));
+                //initializePlayer(Uri.parse(videoURL));
+                mExoPlayer = PlayerUtils.initializePlayer(this, Uri.parse(videoURL), this);
 
+                // Attach the player to the view
+                mPlayerView.setPlayer(mExoPlayer);
                 mPlayerView.setVisibility(View.VISIBLE);
 
             } else {
