@@ -27,5 +27,15 @@
             android:contentDescription="@string/thumbnail_image"/>
     </FrameLayout>
 
+    <TextView
+        android:id="@+id/tv_illustration_not_available_label"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="64dp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textSize="@dimen/recipe_name_text_size"
+        android:hint="@string/illustration_not_available"/>
+
 </FrameLayout>
 

@@ -20,5 +20,7 @@
     <string name="pause">Pause</string>
     <string name="restart">Restart</string>
 
+    <string name="illustration_not_available">Illustration Not Available</string>
+
 
 </resources>

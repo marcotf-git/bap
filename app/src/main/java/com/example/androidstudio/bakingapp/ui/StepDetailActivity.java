@@ -7,13 +7,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 /***
- * This activity has the function of starting the step detail fragment
+ * This activity has the function of starting the step detail fragment.
+ * It will show the description of the step, and the video or thumbnail.
  */
 public class StepDetailActivity extends AppCompatActivity {
 
@@ -21,9 +23,12 @@ public class StepDetailActivity extends AppCompatActivity {
 
     private View mPlayerView;
     private ImageView thumbnailView;
+    private TextView errorMessageView;
 
+    private String stepDescription;
     private String videoURL;
     private String thumbnailURL;
+
 
 
     @Override
@@ -33,8 +38,14 @@ public class StepDetailActivity extends AppCompatActivity {
 
         thumbnailView = findViewById(R.id.iv_thumbnail);
         mPlayerView = findViewById(R.id.player_container);
+        errorMessageView = findViewById(R.id.tv_illustration_not_available_label);
 
         Intent intentThatStartedThisActivity = getIntent();
+
+        // Get the variables to initialize this activity
+        if (intentThatStartedThisActivity.hasExtra("description")) {
+            stepDescription = intentThatStartedThisActivity.getStringExtra("description");
+        }
 
         if (intentThatStartedThisActivity.hasExtra("thumbnailURL")) {
             thumbnailURL = intentThatStartedThisActivity.getStringExtra("thumbnailURL");
@@ -51,6 +62,9 @@ public class StepDetailActivity extends AppCompatActivity {
 
             if (videoURL.equals("")) {
                 thumbnailView.setVisibility(View.GONE);
+                if(errorMessageView != null) {
+                    errorMessageView.setVisibility(View.VISIBLE);
+                }
             } else {
                 thumbnailView.setVisibility(View.VISIBLE);
             }
@@ -69,16 +83,8 @@ public class StepDetailActivity extends AppCompatActivity {
             StepDetailFragment stepDetailFragment = new StepDetailFragment();
 
             // Set the fragment data
-            if (intentThatStartedThisActivity.hasExtra("id")) {
-                stepDetailFragment.setId(intentThatStartedThisActivity
-                        .getIntExtra("id", 0));
-            } else {
-                stepDetailFragment.setId(0);
-            }
-
-            if (intentThatStartedThisActivity.hasExtra("description")) {
-                stepDetailFragment.setDescription(intentThatStartedThisActivity
-                        .getStringExtra("description"));
+            if (stepDescription != null) {
+                stepDetailFragment.setDescription(stepDescription);
             } else {
                 stepDetailFragment.setDescription("No step description available.");
             }
@@ -93,8 +99,7 @@ public class StepDetailActivity extends AppCompatActivity {
 
 
             // Create a new PlayerFragment instance and display it using FragmentManager
-            // or load the Thumbnail
-
+            // or try to load and show the Thumbnail
             if (!videoURL.equals("")) {
 
                 PlayerFragment playerFragment = new PlayerFragment();
