@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout android:id="@+id/view_activity_step_detail_landscape"
+<FrameLayout
+    android:id="@+id/view_activity_step_detail_landscape"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -8,34 +9,39 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <FrameLayout
-        android:id="@+id/player_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#000000">
-    </FrameLayout>
-
-    <FrameLayout
+        android:id="@+id/illustrationView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
+        <!-- The thumbnail -->
         <ImageView
             android:id="@+id/iv_thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:srcCompat="@mipmap/ic_launcher"
-            android:visibility="gone"
-            android:contentDescription="@string/thumbnail_image"/>
-    </FrameLayout>
+            android:contentDescription="@string/thumbnail_image"
+            android:gravity="center"
+            android:layout_gravity="center" />
 
-    <TextView
-        android:id="@+id/tv_illustration_not_available_label"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="64dp"
-        android:gravity="center"
-        android:visibility="gone"
-        android:textSize="@dimen/recipe_name_text_size"
-        android:hint="@string/illustration_not_available"/>
+        <!-- Player Container -->
+        <FrameLayout
+            android:id="@+id/player_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000000" />
+
+        <!-- The error message -->
+        <TextView
+            android:id="@+id/tv_illustration_not_available_label"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="64dp"
+            android:gravity="center"
+            android:textSize="@dimen/recipe_name_text_size"
+            android:hint="@string/illustration_not_available"
+            android:visibility="gone"/>
+
+    </FrameLayout>
 
     <ScrollView
         android:layout_width="match_parent"

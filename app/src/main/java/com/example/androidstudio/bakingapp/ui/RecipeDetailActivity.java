@@ -2,11 +2,8 @@ package com.example.androidstudio.bakingapp.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -15,31 +12,7 @@ import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
 import com.example.androidstudio.bakingapp.utilities.Ingredient;
-import com.example.androidstudio.bakingapp.utilities.PlayerUtils;
 import com.example.androidstudio.bakingapp.utilities.Step;
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.LoadControl;
-import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.BandwidthMeter;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -49,95 +22,108 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import static android.view.View.GONE;
+
 
 public class RecipeDetailActivity extends AppCompatActivity
-    implements StepsFragment.OnItemClickListener,
-    Player.EventListener{
+    implements StepsFragment.OnItemClickListener {
 
     private static final String TAG = RecipeDetailActivity.class.getSimpleName();
 
-    // The views variables
-    private TextView mDisplayName;
+    // Final string to store state information
+    public static final String STEP_NUMBER = "step";
 
-    // The data of the recipe being viewed
+    // The data vars of the recipe being viewed
     private String recipeStringJSON;
     private String recipeName = "";
 
     // The step being viewed
     private int mStep;
+    private JSONArray ingredientsJSON;
+    private JSONArray stepsJSON;
+
 
     // The array for storing information about the ingredients
     private final ArrayList<Ingredient> ingredients = new ArrayList<>();
+
     // The array for storing information about the steps
     private final ArrayList<Step> steps = new ArrayList<>();
 
-        // A single-pane display refers to phone screens, and two-pane to tablet screens
-    private boolean mTwopane;
+    // A single-pane display refers to phone screens, and two-pane to tablet screens
+    private boolean mTwoPane;
 
-    // For the player
-    private SimpleExoPlayer mExoPlayer;
-    private PlayerView mPlayerView;
-    private static MediaSessionCompat mMediaSession;
-    private PlaybackStateCompat.Builder mStateBuilder;
-
-    // For the thumbnail
+    // The views variables
+    private TextView mDisplayName;
+    private View mPlayerView;
     private ImageView thumbnailView;
-
-    // Final Strings to store state information
-    public static final String STEP_NUMBER = "step";
+    private TextView errorMessageView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
 
         // Determine if you are creating a two-pane or single-pane display
         if(findViewById(R.id.view_tablet_linear_layout) != null) {
-            // this LinearLayout will only initially exists in the two-pane tablet case
-            mTwopane = true;
+            // This LinearLayout will only initially exists in the two-pane tablet case
+            mTwoPane = true;
         } else {
-            mTwopane = false;
+            mTwoPane = false;
         }
 
-        mDisplayName = (TextView) findViewById(R.id.tv_recipe_name);
+        // Reload the number of the step that was being viewed, in case of device rotating
+        if (savedInstanceState == null) {
+            mStep = 0;
+        } else {
+            mStep = savedInstanceState.getInt(STEP_NUMBER);
+        }
 
-        if (mTwopane) {
+        // Initialize the views vars
+        mDisplayName = (TextView) findViewById(R.id.tv_recipe_name);
+        errorMessageView = (TextView) findViewById(R.id.tv_illustration_not_available_label);
+
+        // In two pane mode, will have the player and the description
+        if (mTwoPane) {
             // Initialize the player view.
-            mPlayerView = (PlayerView) findViewById(R.id.playerView);
+            mPlayerView = (View) findViewById(R.id.player_container);
             // Initialize the thumbnail view
             thumbnailView = (ImageView) findViewById(R.id.iv_thumbnail);
         }
 
+        // Initialize the data vars for this class
+        // This loads the recipes JSON string, with all the data about the recipes
         Intent intentThatStartedThisActivity = getIntent();
-
         if (intentThatStartedThisActivity.hasExtra("recipeStringJSON")) {
-
             recipeStringJSON = intentThatStartedThisActivity.getStringExtra("recipeStringJSON");
-            updateView(recipeStringJSON, savedInstanceState);
-
         }
+
+        // Render the views with the data vars
+        updateView(recipeStringJSON, savedInstanceState);
 
     }
 
 
-    public void updateView(String recipeStringJSON, Bundle savedState){
+    // This will render the views with the data vars
+    public void updateView(String recipeStringJSON, Bundle savedInstanceState){
 
+        // Prepare the data and render the views
         try {
 
             // Convert the string to the JSON object
             JSONObject recipeJSON = new JSONObject(recipeStringJSON);
+
             // Extract the recipe name
             recipeName = recipeJSON.getString("name");
-            // Update views
+            // Extract the ingredients
+            ingredientsJSON = recipeJSON.getJSONArray("ingredients");
+            // Extract the steps
+            stepsJSON = recipeJSON.getJSONArray("steps");
+
+            // Render the views
             mDisplayName.setText(recipeName);
-
-            JSONArray ingredientsJSON = recipeJSON.getJSONArray("ingredients");
             updateIngredientsView(ingredientsJSON);
-
-            JSONArray stepsJSON = recipeJSON.getJSONArray("steps");
-            updateStepsView(stepsJSON, savedState);
+            updateStepsView(stepsJSON, savedInstanceState);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -146,7 +132,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     /**
-     * This helper function will load the IngredientsFragment, to show the ingredients in a list
+     * This helper function will load the IngredientsFragment, to show the ingredients in a view list.
      */
     public void updateIngredientsView (JSONArray ingredientsJSON) {
 
@@ -160,25 +146,18 @@ public class RecipeDetailActivity extends AppCompatActivity
             int ingredientQuantity;
             String ingredientMeasure;
             String ingredientName;
-
             JSONObject jsonObject;
 
             try {
-
                 jsonObject = ingredientsJSON.getJSONObject(i);
-
                 ingredientQuantity = jsonObject.getInt("quantity");
                 ingredientMeasure = jsonObject.getString("measure");
                 ingredientName = jsonObject.getString("ingredient");
-
                 Ingredient ingredient = new Ingredient(ingredientQuantity, ingredientMeasure, ingredientName);
-
                 ingredients.add(ingredient);
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
 
         // At this point, we have an Array with the ingredients information
@@ -190,17 +169,16 @@ public class RecipeDetailActivity extends AppCompatActivity
         ingredientsFragment.setIngredients(ingredients);
         // Use a FragmentManager and transaction to add the fragment to the screen
         FragmentManager fragmentManager = getSupportFragmentManager();
-        // Fragment transaction
         fragmentManager.beginTransaction()
-                .add(R.id.ingredients_container, ingredientsFragment)
+                .replace(R.id.ingredients_container, ingredientsFragment)
                 .commit();
     }
 
 
     /**
-     * This helper function will load the StepsFragment, to show the steps in a list
+     * This helper function will load the StepsFragment, to show the steps in a view list.
      */
-    public void updateStepsView (JSONArray stepsJSON, Bundle savedState) {
+    public void updateStepsView (JSONArray stepsJSON, Bundle savedInstanceState) {
 
         Log.v(TAG, "updateStepsView stepsJSON:" + stepsJSON.toString());
 
@@ -209,28 +187,22 @@ public class RecipeDetailActivity extends AppCompatActivity
         // Create an ArrayList with the ingredients for the recipe
         for (int i = 0; i < nSteps; i++) {
 
+            int id;
+            String shortDescription;
+            String description;
+            String videoURL;
+            String thumbnailURL;
             JSONObject jsonObject;
 
             try {
-
-                int id;
-                String shortDescription;
-                String description;
-                String videoURL;
-                String thumbnailURL;
-
                 jsonObject = stepsJSON.getJSONObject(i);
-
                 id = jsonObject.getInt("id");
                 shortDescription = jsonObject.getString("shortDescription");
                 description = jsonObject.getString("description");
                 videoURL = jsonObject.getString("videoURL");
                 thumbnailURL = jsonObject.getString("thumbnailURL");
-
                 Step step = new Step(id, shortDescription, description, videoURL, thumbnailURL);
-
                 steps.add(step);
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -246,87 +218,18 @@ public class RecipeDetailActivity extends AppCompatActivity
         // Use a FragmentManager and transaction to add the fragment to the screen
         FragmentManager stepsFragmentManager = getSupportFragmentManager();
         stepsFragmentManager.beginTransaction()
-                .add(R.id.steps_container, stepsFragment)
+                .replace(R.id.steps_container, stepsFragment)
                 .commit();
-
-
-        Log.v(TAG, "updateStepsView savedState:" + savedState);
-
-        if (savedState == null) {
-            mStep = 0;
-        } else {
-            mStep = savedState.getInt(STEP_NUMBER);
-        }
 
         Log.v(TAG, "updateStepsView mStep:" + mStep);
 
         // If two-pane screen, show also the StepDetailFragment with the initial step
-        if (mTwopane && (savedState == null)) {
-            // Create a new StepDetailFragment instance and display it using the FragmentManager
-            StepDetailFragment stepDetailFragment = new StepDetailFragment();
-            // Set the fragment data
-            stepDetailFragment.setDescription(steps.get(mStep).getDescription());
-            // Use a FragmentManager and transaction to add the fragment to the screen
-            FragmentManager stepFragmentManager = getSupportFragmentManager();
-            stepFragmentManager.beginTransaction()
-                    .add(R.id.step_detail_container, stepDetailFragment)
-                    .commit();
+        // and the video of the step
+        if (mTwoPane) {
+            if (savedInstanceState == null) {
+                loadDescriptionAndVideoOrThumbnail(mStep);
+            }
         }
-
-
-//        // If two pane, show also the first video or thumbnail for initial step
-//        if (mTwopane)  {
-//
-//            // Initialize the Media Session.
-//            initializeMediaSession();
-//
-//            String videoURL = steps.get(mStep).getVideoURL();
-//            String thumbnailURL = steps.get(mStep).getThumbnailURL();
-//
-//            // Load the video
-//            if (!videoURL.equals("")) {
-//
-//                Log.v(TAG, "videoURL:" + videoURL);
-//                // Initialize the player.
-//                //initializePlayer(Uri.parse(videoURL));
-//
-//                //initializePlayer(Uri.parse(videoURL));
-//                mExoPlayer = PlayerUtils.initializePlayer(this, Uri.parse(videoURL), this);
-//
-//                // Attach the player to the view
-//                mPlayerView.setPlayer(mExoPlayer);
-//
-//            } else {
-//
-//                mPlayerView.setVisibility(View.GONE);
-//
-//                // Show the thumbnail, if exists
-//                if (!thumbnailURL.equals("")) {
-//
-//                    Log.v(TAG, "thumbnailURL:" + thumbnailURL);
-//                    /*
-//                     * Use the call back of picasso to manage the error in loading thumbnail.
-//                     */
-//                    Picasso.with(this)
-//                            .load(thumbnailURL)
-//                            .into(thumbnailView, new Callback() {
-//                                @Override
-//                                public void onSuccess() {
-//                                    Log.v(TAG, "Thumbnail loaded");
-//                                    thumbnailView.setVisibility(View.VISIBLE);
-//                                }
-//
-//                                @Override
-//                                public void onError() {
-//                                    Log.e(TAG, "Error in loading thumbnail");
-//                                    thumbnailView.setVisibility(View.GONE);
-//                                }
-//                            });
-//                }
-//            }
-//
-//        }
-
     }
 
 
@@ -336,83 +239,71 @@ public class RecipeDetailActivity extends AppCompatActivity
     @Override
     public void onStepSelected(int position) {
 
-        //Toast.makeText(this, "Position= " + position, Toast.LENGTH_SHORT).show();
         Log.v(TAG, "onStepSelected:" + position);
 
-        Step step = steps.get(position);
-
         mStep = position;
-
         Context context = RecipeDetailActivity.this;
 
-
-        if (!mTwopane) {
-
+        if (!mTwoPane) {
             // If one-pane screen, call the StepDetailActivity to show the step detail
-
             Class destinationActivity = StepDetailActivity.class;
             Intent startChildActivityIntent = new Intent(context, destinationActivity);
-
-            startChildActivityIntent.putExtra("id", step.getId());
-            startChildActivityIntent.putExtra("shortDescription", step.getShortDescription());
-            startChildActivityIntent.putExtra("description", step.getDescription());
-            startChildActivityIntent.putExtra("videoURL", step.getVideoURL());
-            startChildActivityIntent.putExtra("thumbnailURL", step.getThumbnailURL());
-
+            startChildActivityIntent.putExtra("mStep", mStep);
+            startChildActivityIntent.putExtra("stepsJSONtoString", stepsJSON.toString());
             startActivity(startChildActivityIntent);
+        } else {
+            // If two-pane screen, show also the StepDetailFragment with the initial step
+            // and the video of the step
+            loadDescriptionAndVideoOrThumbnail(mStep);
+        }
+    }
+
+
+    // Helper method for loading the step description, and also its video or thumbnail
+    private void loadDescriptionAndVideoOrThumbnail (int stepNumber) {
+
+        // Set initial state of the player anf thumbnail views
+        errorMessageView.setVisibility(View.GONE);
+        mPlayerView.setVisibility(View.GONE);
+        thumbnailView.setVisibility(View.GONE);
+
+        // Create a new StepDetailFragment instance and display it using the FragmentManager
+        StepDetailFragment stepDetailFragment = new StepDetailFragment();
+        // Set the fragment data
+        stepDetailFragment.setDescription(steps.get(stepNumber).getDescription());
+        // Use a FragmentManager and transaction to add the fragment to the screen
+        FragmentManager stepFragmentManager = getSupportFragmentManager();
+        stepFragmentManager.beginTransaction()
+                .replace(R.id.step_detail_container, stepDetailFragment)
+                .commit();
+
+        // Then, try to load a new one
+        String mStepVideoURL = steps.get(stepNumber).getVideoURL();
+
+        if (mStepVideoURL != null && (!mStepVideoURL.equals(""))) {
+
+            PlayerFragment playerFragment = new PlayerFragment();
+            // Set the fragment data
+            playerFragment.setMediaUrl(mStepVideoURL);
+            // Use a FragmentManager and transaction to add the fragment to the screen
+            FragmentManager playerFragmentManager = getSupportFragmentManager();
+            // Use a FragmentManager and transaction to add the fragment to the screen
+            playerFragmentManager.beginTransaction()
+                    .replace(R.id.player_container, playerFragment)
+                    .commit();
+            mPlayerView.setVisibility(View.VISIBLE);
 
         } else {
 
-            // If two-pane screen, update the container with the step detail fragment
+            // In case of no video, try to show the thumbnail
+            String mStepThumbnailURL = steps.get(stepNumber).getThumbnailURL();
 
-            // Create a new StepDetailFragment instance and display it using the FragmentManager
-            StepDetailFragment stepDetailFragment = new StepDetailFragment();
-            // Set the fragment data
-            stepDetailFragment.setDescription(step.getDescription());
-            // Use a FragmentManager and transaction to add the fragment to the screen
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            // Fragment transaction
-            fragmentManager.beginTransaction()
-                    .replace(R.id.step_detail_container, stepDetailFragment)
-                    .commit();
-
-
-            // Also load the video or thumbnail
-
-            String videoURL = step.getVideoURL();
-            String thumbnailURL = step.getThumbnailURL();
-
-            Log.v(TAG, "videoURL:" + videoURL);
-
-            // First, release the player
-            if (null != mExoPlayer) {
-                releasePlayer();
-            }
-
-            // Load the video
-            if (!videoURL.equals("")) {
-
-                // Initialize the player.
-                //initializePlayer(Uri.parse(videoURL));
-                mExoPlayer = PlayerUtils.initializePlayer(this, Uri.parse(videoURL), this);
-
-                // Attach the player to the view
-                mPlayerView.setPlayer(mExoPlayer);
-                mPlayerView.setVisibility(View.VISIBLE);
-
-            } else {
-
-                mPlayerView.setVisibility(View.GONE);
-
-                // Show the thumbnail, if exists
-                if (!thumbnailURL.equals("")) {
-
-                    Log.v(TAG, "thumbnailURL:" + thumbnailURL);
-                    /*
-                     * Use the call back of picasso to manage the error in loading thumbnail.
-                     */
-                    Picasso.with(this)
-                        .load(thumbnailURL)
+            if (mStepThumbnailURL != null && (!mStepThumbnailURL.equals(""))) {
+                /*
+                 * Use the call back of picasso to manage the error in loading thumbnail.
+                 */
+                Picasso.with(this)
+                        .load(mStepThumbnailURL)
                         .into(thumbnailView, new Callback() {
                             @Override
                             public void onSuccess() {
@@ -423,193 +314,14 @@ public class RecipeDetailActivity extends AppCompatActivity
                             @Override
                             public void onError() {
                                 Log.e(TAG, "Error in loading thumbnail");
-                                thumbnailView.setVisibility(View.GONE);
+                                if (mPlayerView.getVisibility() == GONE) {
+                                    errorMessageView.setVisibility(View.VISIBLE);
+                                }
                             }
                         });
-                }
             }
-
         }
 
-    }
-
-    @Override
-    public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
-
-    }
-
-    @Override
-    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
-    }
-
-    @Override
-    public void onLoadingChanged(boolean isLoading) {
-
-    }
-
-    @Override
-    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        if((playbackState == Player.STATE_READY) && playWhenReady){
-            mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
-                    mExoPlayer.getCurrentPosition(), 1f);
-        } else if((playbackState == Player.STATE_READY)){
-            mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
-                    mExoPlayer.getCurrentPosition(), 1f);
-        }
-        mMediaSession.setPlaybackState(mStateBuilder.build());
-    }
-
-    @Override
-    public void onRepeatModeChanged(int repeatMode) {
-
-    }
-
-    @Override
-    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-
-    }
-
-    @Override
-    public void onPlayerError(ExoPlaybackException error) {
-
-    }
-
-    @Override
-    public void onPositionDiscontinuity(int reason) {
-
-    }
-
-    @Override
-    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-
-    }
-
-    @Override
-    public void onSeekProcessed() {
-
-    }
-
-
-    /**
-     * Media Session Callbacks, where all external clients control the player.
-     */
-    private class MySessionCallback extends MediaSessionCompat.Callback {
-        @Override
-        public void onPlay() {
-            mExoPlayer.setPlayWhenReady(true);
-        }
-
-        @Override
-        public void onPause() {
-            mExoPlayer.setPlayWhenReady(false);
-        }
-
-        @Override
-        public void onSkipToPrevious() {
-            mExoPlayer.seekTo(0);
-        }
-    }
-
-    /**
-     * Initializes the Media Session to be enabled with media buttons, transport controls, callbacks
-     * and media controller.
-     */
-    private void initializeMediaSession() {
-
-        // Create a MediaSessionCompat.
-        mMediaSession = new MediaSessionCompat(this, TAG);
-
-        // Enable callbacks from MediaButtons and TransportControls.
-        mMediaSession.setFlags(
-                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-
-        // Do not let MediaButtons restart the player when the app is not visible.
-        mMediaSession.setMediaButtonReceiver(null);
-
-        // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
-        mStateBuilder = new PlaybackStateCompat.Builder()
-                .setActions(
-                        PlaybackStateCompat.ACTION_PLAY |
-                                PlaybackStateCompat.ACTION_PAUSE |
-                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
-                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
-
-        mMediaSession.setPlaybackState(mStateBuilder.build());
-
-        // MySessionCallback has methods that handle callbacks from a media controller.
-        mMediaSession.setCallback(new RecipeDetailActivity.MySessionCallback());
-
-        // Start the Media Session since the activity is active.
-        mMediaSession.setActive(true);
-
-    }
-
-
-    /**
-     * Initialize ExoPlayer.
-     * @param mediaUri The URI of the sample to play.
-     */
-    private void initializePlayer(Uri mediaUri) {
-
-        if (mExoPlayer == null) {
-            // Create an instance of the ExoPlayer.
-
-            // Measures bandwidth during playback. Can be null if not required.
-            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            // Create a default TrackSelector
-            TrackSelection.Factory videoTrackSelectionFactory =
-                    new AdaptiveTrackSelection.Factory(bandwidthMeter);
-            TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-            // Load Control
-            LoadControl loadControl = new DefaultLoadControl();
-            // Renderer
-            DefaultRenderersFactory renderersFactory = new DefaultRenderersFactory(this);
-
-            // Create a new ExoPlayer instance
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector, loadControl);
-
-            // Attach the player to the view
-            mPlayerView.setPlayer(mExoPlayer);
-
-            // Set the ExoPlayer.EventListener to this activity.
-            mExoPlayer.addListener(this);
-
-            // Prepare the MediaSource.
-            String userAgent = Util.getUserAgent(this, "BakingApp");
-            // Produces DataSource instances through which media data is loaded.
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, userAgent);
-            MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(mediaUri);
-
-            // Attach the media source
-            mExoPlayer.prepare(videoSource);
-
-            // Set the player to begin playing
-            mExoPlayer.setPlayWhenReady(true);
-        }
-
-    }
-
-
-    /**
-     * Release ExoPlayer.
-     */
-    private void releasePlayer() {
-        mExoPlayer.stop();
-        mExoPlayer.release();
-        mExoPlayer = null;
-    }
-
-
-    // Release the player when activity is destroyed
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(null != mExoPlayer) {
-            releasePlayer();
-        }
     }
 
 

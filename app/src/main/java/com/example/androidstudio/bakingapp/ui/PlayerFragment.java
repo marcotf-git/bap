@@ -269,7 +269,6 @@ public class PlayerFragment extends Fragment {
     // It will save the principal variables when the device is rotated
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
 
         if (player != null) {
 
@@ -283,6 +282,7 @@ public class PlayerFragment extends Fragment {
             outState.putString("mediaUrl", mediaUrl);
         }
 
+        super.onSaveInstanceState(outState);
     }
 
     // The Player listener
