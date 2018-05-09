@@ -3,6 +3,7 @@ package com.example.androidstudio.bakingapp.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -32,6 +33,12 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     // Final string to store state information
     public static final String STEP_NUMBER = "step";
+
+    // Final strings to store views visibility state
+    public static final String PLAYER_VIEW_VISIBILIBITY = "player_view_visibility";
+    public static final String THUMBNAIL_VIEW_VISIBILIBITY = "thumbnail_view_visibility";
+    public static final String ERROR_VIEW_VISIBILIBITY = "error_view_visibility";
+
 
     // The data vars of the recipe being viewed
     private String recipeStringJSON;
@@ -89,6 +96,13 @@ public class RecipeDetailActivity extends AppCompatActivity
             mPlayerView = (View) findViewById(R.id.player_container);
             // Initialize the thumbnail view
             thumbnailView = (ImageView) findViewById(R.id.iv_thumbnail);
+        }
+
+        // Recover the views state in case of device rotating
+        if (savedInstanceState != null && mTwoPane) {
+            mPlayerView.setVisibility(savedInstanceState.getInt(PLAYER_VIEW_VISIBILIBITY));
+            thumbnailView.setVisibility(savedInstanceState.getInt(THUMBNAIL_VIEW_VISIBILIBITY));
+            errorMessageView.setVisibility(savedInstanceState.getInt(ERROR_VIEW_VISIBILIBITY));
         }
 
         // Initialize the data vars for this class
@@ -225,10 +239,8 @@ public class RecipeDetailActivity extends AppCompatActivity
 
         // If two-pane screen, show also the StepDetailFragment with the initial step
         // and the video of the step
-        if (mTwoPane) {
-            if (savedInstanceState == null) {
-                loadDescriptionAndVideoOrThumbnail(mStep);
-            }
+        if (mTwoPane && savedInstanceState == null) {
+            loadDescriptionAndVideoOrThumbnail(mStep);
         }
     }
 
@@ -262,10 +274,21 @@ public class RecipeDetailActivity extends AppCompatActivity
     // Helper method for loading the step description, and also its video or thumbnail
     private void loadDescriptionAndVideoOrThumbnail (int stepNumber) {
 
-        // Set initial state of the player anf thumbnail views
+        // Set initial state of the player and thumbnail views (this method is only called in two pane)
         errorMessageView.setVisibility(View.GONE);
         mPlayerView.setVisibility(View.GONE);
         thumbnailView.setVisibility(View.GONE);
+
+        // Remove previously loaded fragments
+        FragmentManager myFragmentManager = getSupportFragmentManager();
+        Fragment fragment = myFragmentManager.findFragmentById(R.id.step_detail_container);
+        if (null != fragment) {
+            myFragmentManager.beginTransaction().remove(fragment).commit();
+        }
+        fragment = myFragmentManager.findFragmentById(R.id.player_container);
+        if (null != fragment) {
+            myFragmentManager.beginTransaction().remove(fragment).commit();
+        }
 
         // Create a new StepDetailFragment instance and display it using the FragmentManager
         StepDetailFragment stepDetailFragment = new StepDetailFragment();
@@ -274,7 +297,7 @@ public class RecipeDetailActivity extends AppCompatActivity
         // Use a FragmentManager and transaction to add the fragment to the screen
         FragmentManager stepFragmentManager = getSupportFragmentManager();
         stepFragmentManager.beginTransaction()
-                .replace(R.id.step_detail_container, stepDetailFragment)
+                .add(R.id.step_detail_container, stepDetailFragment)
                 .commit();
 
         // Then, try to load a new one
@@ -289,7 +312,7 @@ public class RecipeDetailActivity extends AppCompatActivity
             FragmentManager playerFragmentManager = getSupportFragmentManager();
             // Use a FragmentManager and transaction to add the fragment to the screen
             playerFragmentManager.beginTransaction()
-                    .replace(R.id.player_container, playerFragment)
+                    .add(R.id.player_container, playerFragment)
                     .commit();
             mPlayerView.setVisibility(View.VISIBLE);
 
@@ -319,6 +342,8 @@ public class RecipeDetailActivity extends AppCompatActivity
                                 }
                             }
                         });
+            }  else {
+                errorMessageView.setVisibility(View.VISIBLE);
             }
         }
 
@@ -329,6 +354,11 @@ public class RecipeDetailActivity extends AppCompatActivity
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putInt(STEP_NUMBER, mStep);
+        if(mTwoPane) {
+            savedInstanceState.putInt(PLAYER_VIEW_VISIBILIBITY, mPlayerView.getVisibility());
+            savedInstanceState.putInt(THUMBNAIL_VIEW_VISIBILIBITY, thumbnailView.getVisibility());
+            savedInstanceState.putInt(ERROR_VIEW_VISIBILIBITY, errorMessageView.getVisibility());
+        }
         super.onSaveInstanceState(savedInstanceState);
     }
 

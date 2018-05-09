@@ -2,7 +2,7 @@ package com.example.androidstudio.bakingapp.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -44,7 +44,12 @@ public class StepDetailActivity extends AppCompatActivity {
 
     // Fields for handling the saving and restoring of view state
     private static final String ERROR_MESSAGE_VIEW_STATE = "errorMessageViewState";
-    private Parcelable errorMessageViewState;
+
+    // Final strings to store views visibility state
+    public static final String PLAYER_VIEW_VISIBILIBITY = "player_view_visibility";
+    public static final String THUMBNAIL_VIEW_VISIBILIBITY = "thumbnail_view_visibility";
+    public static final String ERROR_VIEW_VISIBILIBITY = "error_view_visibility";
+
 
 
     @Override
@@ -64,7 +69,16 @@ public class StepDetailActivity extends AppCompatActivity {
         illustrationView = findViewById(R.id.illustrationView);
         errorMessageView = findViewById(R.id.tv_illustration_not_available_label);
 
-        // Get the variables to initialize this activity
+        // Recover the views state in case of device rotating
+        if (savedInstanceState != null) {
+            mPlayerView.setVisibility(savedInstanceState.getInt(PLAYER_VIEW_VISIBILIBITY));
+            thumbnailView.setVisibility(savedInstanceState.getInt(THUMBNAIL_VIEW_VISIBILIBITY));
+            errorMessageView.setVisibility(savedInstanceState.getInt(ERROR_VIEW_VISIBILIBITY));
+        }
+
+
+        // Initialize the data vars for this class
+
         Intent intentThatStartedThisActivity = getIntent();
 
         if (null != savedInstanceState) {
@@ -87,9 +101,11 @@ public class StepDetailActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        // Load the variables for the current step mStep
+        // Extract the variables for the current step mStep
         loadStepVars();
+
+
+        // Render the views with the data vars
 
         // Create a new StepDetailFragment instance and display it using the FragmentManager
         // only create new fragment when there is no previously saved state
@@ -97,13 +113,27 @@ public class StepDetailActivity extends AppCompatActivity {
             loadViews();
         }
 
-        // Set the visibility of the views for error handling
-        adjustVisibility();
-
     }
 
 
     private void loadViews() {
+
+        // Set initial state of the player and thumbnail views (this method is only called in two pane)
+        errorMessageView.setVisibility(View.GONE);
+        mPlayerView.setVisibility(View.GONE);
+        thumbnailView.setVisibility(View.GONE);
+
+        // Remove previously loaded fragments
+        FragmentManager myFragmentManager = getSupportFragmentManager();
+        Fragment fragment = myFragmentManager.findFragmentById(R.id.step_detail_container);
+        if (null != fragment) {
+            myFragmentManager.beginTransaction().remove(fragment).commit();
+        }
+        fragment = myFragmentManager.findFragmentById(R.id.player_container);
+        if (null != fragment) {
+            myFragmentManager.beginTransaction().remove(fragment).commit();
+        }
+
 
         Log.v(TAG, "loadViews videoURL:" + videoURL);
 
@@ -116,13 +146,10 @@ public class StepDetailActivity extends AppCompatActivity {
         } else {
             stepDetailFragment.setDescription("No step description available.");
         }
-
         // Use a FragmentManager and transaction to add the fragment to the screen
         FragmentManager fragmentManager = getSupportFragmentManager();
-
-        // Fragment transaction
         fragmentManager.beginTransaction()
-                .replace(R.id.step_detail_container, stepDetailFragment)
+                .add(R.id.step_detail_container, stepDetailFragment)
                 .commit();
 
         // Create a new PlayerFragment instance and display it using FragmentManager
@@ -134,10 +161,10 @@ public class StepDetailActivity extends AppCompatActivity {
             playerFragment.setMediaUrl(videoURL);
             // Use a FragmentManager and transaction to add the fragment to the screen
             FragmentManager playerFragmentManager = getSupportFragmentManager();
-            // Use a FragmentManager and transaction to add the fragment to the screen
             playerFragmentManager.beginTransaction()
-                    .replace(R.id.player_container, playerFragment)
+                    .add(R.id.player_container, playerFragment)
                     .commit();
+            mPlayerView.setVisibility(View.VISIBLE);
 
         } else {
 
@@ -154,7 +181,9 @@ public class StepDetailActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess() {
                                 Log.v(TAG, "Thumbnail loaded");
+                                thumbnailView.setVisibility(View.VISIBLE);
                             }
+
                             @Override
                             public void onError() {
                                 Log.e(TAG, "Error in loading thumbnail");
@@ -164,14 +193,18 @@ public class StepDetailActivity extends AppCompatActivity {
                                 }
                             }
                         });
+            } else {
+                errorMessageView.setVisibility(View.VISIBLE);
             }
 
         }
     }
 
 
+    // Extract the vars for the step being viewed
     private void loadStepVars() {
 
+        // Extract the vars for the mStep
         try {
             jsonObject = stepsJSON.getJSONObject(mStep);
             stepDescription = jsonObject.getString("description");
@@ -182,58 +215,18 @@ public class StepDetailActivity extends AppCompatActivity {
         }
     }
 
-    // Adjust the visibility of the views for handling errors
-    private void adjustVisibility() {
-
-        // Initial values
-        errorMessageView.setVisibility(View.GONE);
-        mPlayerView.setVisibility(View.GONE);
-        thumbnailView.setVisibility(View.GONE);
-        illustrationView.setVisibility(View.GONE);
-
-        Log.v(TAG, "adjustVisibility videoURL:" + videoURL);
-
-        // Adjust according to state
-        if (videoURL.equals("")) {
-
-            if (thumbnailURL.equals("")) {
-
-                errorMessageView.setVisibility(View.VISIBLE);
-                illustrationView.setVisibility(View.VISIBLE);
-
-                Log.v(TAG, "adjustVisibility state 3");
-
-            } else {
-
-                thumbnailView.setVisibility(View.VISIBLE);
-                illustrationView.setVisibility(View.VISIBLE);
-
-                Log.v(TAG, "adjustVisibility state 2");
-            }
-
-        } else {
-
-            mPlayerView.setVisibility(View.VISIBLE);
-            illustrationView.setVisibility(View.VISIBLE);
-
-            Log.v(TAG, "adjustVisibility state 1");
-
-        }
-    }
 
 
     // Called by button Prev
     public void loadPrevStep(View view) {
 
         mStep--;
-
         if (mStep < 0) {
             mStep = 0;
         }
 
         loadStepVars();
         loadViews();
-        adjustVisibility();
     }
 
 
@@ -241,14 +234,12 @@ public class StepDetailActivity extends AppCompatActivity {
     public void loadNextStep(View view) {
 
         mStep++;
-
         if (mStep >= stepsJSON.length()) {
             mStep = stepsJSON.length() - 1;
         }
 
         loadStepVars();
         loadViews();
-        adjustVisibility();
     }
 
 
@@ -256,23 +247,19 @@ public class StepDetailActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
 
-        Parcelable errorMessageViewState = errorMessageView.onSaveInstanceState();
-        outState.putParcelable(ERROR_MESSAGE_VIEW_STATE, errorMessageViewState);
+        outState.putInt(PLAYER_VIEW_VISIBILIBITY, mPlayerView.getVisibility());
+        outState.putInt(THUMBNAIL_VIEW_VISIBILIBITY, thumbnailView.getVisibility());
+        outState.putInt(ERROR_VIEW_VISIBILIBITY, errorMessageView.getVisibility());
 
         outState.putInt("mStep", mStep);
 
         super.onSaveInstanceState(outState);
     }
 
+
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-
-        mStep = savedInstanceState.getInt("mStep");
-
-
-
-        Log.v(TAG, "onRestoreInstanceState mStep:" + mStep);
     }
 
 }
