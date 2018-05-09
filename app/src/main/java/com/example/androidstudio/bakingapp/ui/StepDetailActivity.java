@@ -29,12 +29,18 @@ public class StepDetailActivity extends AppCompatActivity {
     private String videoURL;
     private String thumbnailURL;
 
-
+    private boolean isLandscape;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_step_detail);
+
+        if(null != findViewById(R.id.view_activity_step_detail_landscape)) {
+            isLandscape = true;
+        } else {
+            isLandscape = false;
+        }
 
         thumbnailView = findViewById(R.id.iv_thumbnail);
         mPlayerView = findViewById(R.id.player_container);
@@ -74,6 +80,7 @@ public class StepDetailActivity extends AppCompatActivity {
             mPlayerView.setVisibility(View.VISIBLE);
             thumbnailView.setVisibility(View.GONE);
         }
+
 
         // Create a new StepDetailFragment instance and display it using the FragmentManager
         // only create new fragment when there is no previously saved state
