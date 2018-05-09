@@ -42,7 +42,7 @@ public class PlayerFragment extends Fragment {
     private static final DefaultBandwidthMeter BANDWIDTH_METER =
             new DefaultBandwidthMeter();
 
-    PlayerView playerView;
+    private PlayerView playerView;
     private SimpleExoPlayer player;
     private boolean playWhenReady = true;
     private int currentWindow;
@@ -51,7 +51,6 @@ public class PlayerFragment extends Fragment {
     private MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
     private boolean isLandscape;
-
 
     // This variable has a setter method and it is for initializing the fragment
     private String mediaUrl;

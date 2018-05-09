@@ -1,7 +1,8 @@
 package com.example.androidstudio.bakingapp.utilities;
 
-import android.os.Bundle;
-
+/**
+ * This class will store the step
+ */
 public class Step {
 
     private int mId;

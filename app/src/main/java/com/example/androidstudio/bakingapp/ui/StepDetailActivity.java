@@ -26,30 +26,24 @@ public class StepDetailActivity extends AppCompatActivity {
 
     private static final String TAG = StepDetailActivity.class.getSimpleName();
 
-    private View mPlayerView;
-    private ImageView thumbnailView;
-    private View illustrationView;
-    private TextView errorMessageView;
+    // Final strings to store views visibility state
+    public static final String PLAYER_VIEW_VISIBILIBITY = "player_view_visibility";
+    public static final String THUMBNAIL_VIEW_VISIBILIBITY = "thumbnail_view_visibility";
+    public static final String ERROR_VIEW_VISIBILIBITY = "error_view_visibility";
 
+    // The data vars of the recipe being viewed
     private String stepsJSONtoString;
     private JSONArray stepsJSON;
-
     private int mStep;
     private JSONObject jsonObject;
     private String stepDescription;
     private String videoURL;
     private String thumbnailURL;
 
-    private boolean isLandscape;
-
-    // Fields for handling the saving and restoring of view state
-    private static final String ERROR_MESSAGE_VIEW_STATE = "errorMessageViewState";
-
-    // Final strings to store views visibility state
-    public static final String PLAYER_VIEW_VISIBILIBITY = "player_view_visibility";
-    public static final String THUMBNAIL_VIEW_VISIBILIBITY = "thumbnail_view_visibility";
-    public static final String ERROR_VIEW_VISIBILIBITY = "error_view_visibility";
-
+    // The views variables
+    private View mPlayerView;
+    private ImageView thumbnailView;
+    private TextView errorMessageView;
 
 
     @Override
@@ -57,16 +51,9 @@ public class StepDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_step_detail);
 
-        // Set the views variables
-        if(null != findViewById(R.id.view_activity_step_detail_landscape)) {
-            isLandscape = true;
-        } else {
-            isLandscape = false;
-        }
-
+        // Initialize the views variables
         thumbnailView = findViewById(R.id.iv_thumbnail);
         mPlayerView = findViewById(R.id.player_container);
-        illustrationView = findViewById(R.id.illustrationView);
         errorMessageView = findViewById(R.id.tv_illustration_not_available_label);
 
         // Recover the views state in case of device rotating
@@ -76,11 +63,9 @@ public class StepDetailActivity extends AppCompatActivity {
             errorMessageView.setVisibility(savedInstanceState.getInt(ERROR_VIEW_VISIBILIBITY));
         }
 
-
-        // Initialize the data vars for this class
+        /* Initialize the data vars for this class */
 
         Intent intentThatStartedThisActivity = getIntent();
-
         if (null != savedInstanceState) {
             mStep = savedInstanceState.getInt("mStep");
         } else {
@@ -101,11 +86,11 @@ public class StepDetailActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         // Extract the variables for the current step mStep
         loadStepVars();
 
-
-        // Render the views with the data vars
+        /* Render the views with the data vars */
 
         // Create a new StepDetailFragment instance and display it using the FragmentManager
         // only create new fragment when there is no previously saved state
@@ -133,7 +118,6 @@ public class StepDetailActivity extends AppCompatActivity {
         if (null != fragment) {
             myFragmentManager.beginTransaction().remove(fragment).commit();
         }
-
 
         Log.v(TAG, "loadViews videoURL:" + videoURL);
 
@@ -214,7 +198,6 @@ public class StepDetailActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
 
 
     // Called by button Prev

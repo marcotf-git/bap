@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
 
-
+/**
+ * This is a utility class for loading the data from the JSON file.
+ */
 public class FileUtils {
 
 
@@ -16,7 +18,7 @@ public class FileUtils {
             return null;
         }
 
-        String recipesJSONString = null;
+        String recipesJSONString;
         AssetManager assetManager = context.getAssets();
 
         try{
@@ -36,11 +38,10 @@ public class FileUtils {
                 return null;
             }
 
-        } catch (Exception e){
-           e.printStackTrace();
+        } catch (IOException e){
+           throw new IOException(e.getMessage());
         }
 
-        return null;
     }
 
 }

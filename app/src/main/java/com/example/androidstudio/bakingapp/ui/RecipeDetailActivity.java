@@ -39,7 +39,6 @@ public class RecipeDetailActivity extends AppCompatActivity
     public static final String THUMBNAIL_VIEW_VISIBILIBITY = "thumbnail_view_visibility";
     public static final String ERROR_VIEW_VISIBILIBITY = "error_view_visibility";
 
-
     // The data vars of the recipe being viewed
     private String recipeStringJSON;
     private String recipeName = "";
@@ -246,32 +245,9 @@ public class RecipeDetailActivity extends AppCompatActivity
 
 
     /**
-     * This is the listener that receives communication from the StepsFragment
+     * Helper method for loading the step description, and also its video or thumbnail
+     *
      */
-    @Override
-    public void onStepSelected(int position) {
-
-        Log.v(TAG, "onStepSelected:" + position);
-
-        mStep = position;
-        Context context = RecipeDetailActivity.this;
-
-        if (!mTwoPane) {
-            // If one-pane screen, call the StepDetailActivity to show the step detail
-            Class destinationActivity = StepDetailActivity.class;
-            Intent startChildActivityIntent = new Intent(context, destinationActivity);
-            startChildActivityIntent.putExtra("mStep", mStep);
-            startChildActivityIntent.putExtra("stepsJSONtoString", stepsJSON.toString());
-            startActivity(startChildActivityIntent);
-        } else {
-            // If two-pane screen, show also the StepDetailFragment with the initial step
-            // and the video of the step
-            loadDescriptionAndVideoOrThumbnail(mStep);
-        }
-    }
-
-
-    // Helper method for loading the step description, and also its video or thumbnail
     private void loadDescriptionAndVideoOrThumbnail (int stepNumber) {
 
         // Set initial state of the player and thumbnail views (this method is only called in two pane)
@@ -346,7 +322,32 @@ public class RecipeDetailActivity extends AppCompatActivity
                 errorMessageView.setVisibility(View.VISIBLE);
             }
         }
+    }
 
+
+    /**
+     * This is the listener that receives communication from the StepsFragment
+     */
+    @Override
+    public void onStepSelected(int position) {
+
+        Log.v(TAG, "onStepSelected:" + position);
+
+        mStep = position;
+        Context context = RecipeDetailActivity.this;
+
+        if (!mTwoPane) {
+            // If one-pane screen, call the StepDetailActivity to show the step detail
+            Class destinationActivity = StepDetailActivity.class;
+            Intent startChildActivityIntent = new Intent(context, destinationActivity);
+            startChildActivityIntent.putExtra("mStep", mStep);
+            startChildActivityIntent.putExtra("stepsJSONtoString", stepsJSON.toString());
+            startActivity(startChildActivityIntent);
+        } else {
+            // If two-pane screen, show also the StepDetailFragment with the initial step
+            // and the video of the step
+            loadDescriptionAndVideoOrThumbnail(mStep);
+        }
     }
 
 

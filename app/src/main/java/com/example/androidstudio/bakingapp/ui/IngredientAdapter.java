@@ -53,5 +53,4 @@ public class IngredientAdapter extends ArrayAdapter<Ingredient> {
         return listItemView;
     }
 
-
 }
