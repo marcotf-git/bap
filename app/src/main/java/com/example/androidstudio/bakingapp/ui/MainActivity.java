@@ -165,8 +165,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<String> loader, String recipesStringJSON) {
 
-        Log.v("onLoadFinished", "loader id:" + loader.getId());
-
+        Log.v(TAG, "onLoadFinished loader id:" + loader.getId());
         Log.v(TAG, "onLoadFinished recipesJSONString:" + recipesStringJSON);
         Log.v(TAG, "onLoadFinished recipesJSONString size:" + recipesStringJSON.length());
 
