@@ -2,11 +2,11 @@ package com.example.androidstudio.bakingapp.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -21,6 +21,9 @@ import com.example.androidstudio.bakingapp.utilities.RecipesBox;
 
 import java.io.IOException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 public class MainActivity extends AppCompatActivity
         implements  RecipesListAdapter.ListItemClickListener,
@@ -32,11 +35,12 @@ public class MainActivity extends AppCompatActivity
     /* This number will uniquely identify our Loader and is chosen arbitrarily. */
     private static final int RECIPES_LOADER_FROM_FILE_ID = 10;
 
-    private TextView mErrorMessageDisplay;
-    private ProgressBar mLoadingIndicator;
+    @BindView(R.id.tv_error_message_display) TextView mErrorMessageDisplay;
+    @BindView(R.id.pb_loading_indicator) ProgressBar mLoadingIndicator;
 
     private RecipesListAdapter mAdapter;
-    private RecyclerView mRecipesList;
+
+    @BindView(R.id.rv_recipes) RecyclerView mRecipesList;
 
 
     @Override
@@ -45,14 +49,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
-
-        /*
-         * Using findViewById, we get a reference to our RecyclerView from xml. This allows us to
-         * do things like set the adapter of the RecyclerView and toggle the visibility.
-         */
-        mRecipesList = (RecyclerView) findViewById(R.id.rv_recipes);
+        ButterKnife.bind(this);
 
         /*
          * A LinearLayoutManager is responsible for measuring and positioning item views within a

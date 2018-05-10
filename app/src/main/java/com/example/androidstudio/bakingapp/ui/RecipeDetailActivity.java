@@ -3,6 +3,7 @@ package com.example.androidstudio.bakingapp.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 import static android.view.View.GONE;
 
@@ -59,16 +63,18 @@ public class RecipeDetailActivity extends AppCompatActivity
     private boolean mTwoPane;
 
     // The views variables
-    private TextView mDisplayName;
-    private View mPlayerView;
-    private ImageView thumbnailView;
-    private TextView errorMessageView;
+    @BindView(R.id.tv_recipe_name) TextView mDisplayName;
+    @Nullable @BindView(R.id.player_container) View mPlayerView;
+    @Nullable @BindView(R.id.iv_thumbnail) ImageView thumbnailView;
+    @Nullable @BindView(R.id.tv_illustration_not_available_label) TextView errorMessageView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
+
+        ButterKnife.bind(this);
 
         // Determine if you are creating a two-pane or single-pane display
         if(findViewById(R.id.view_tablet_linear_layout) != null) {
@@ -85,17 +91,6 @@ public class RecipeDetailActivity extends AppCompatActivity
             mStep = savedInstanceState.getInt(STEP_NUMBER);
         }
 
-        // Initialize the views vars
-        mDisplayName = (TextView) findViewById(R.id.tv_recipe_name);
-        errorMessageView = (TextView) findViewById(R.id.tv_illustration_not_available_label);
-
-        // In two pane mode, will have the player and the description
-        if (mTwoPane) {
-            // Initialize the player view.
-            mPlayerView = (View) findViewById(R.id.player_container);
-            // Initialize the thumbnail view
-            thumbnailView = (ImageView) findViewById(R.id.iv_thumbnail);
-        }
 
         // Recover the views state in case of device rotating
         if (savedInstanceState != null && mTwoPane) {

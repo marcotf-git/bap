@@ -18,6 +18,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /***
  * This activity has the function of starting the step detail fragment.
  * It will show the description of the step, and the video or thumbnail.
@@ -41,9 +44,9 @@ public class StepDetailActivity extends AppCompatActivity {
     private String thumbnailURL;
 
     // The views variables
-    private View mPlayerView;
-    private ImageView thumbnailView;
-    private TextView errorMessageView;
+    @BindView(R.id.player_container) View mPlayerView;
+    @BindView(R.id.iv_thumbnail) ImageView thumbnailView;
+    @BindView(R.id.tv_illustration_not_available_label) TextView errorMessageView;
 
 
     @Override
@@ -51,10 +54,7 @@ public class StepDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_step_detail);
 
-        // Initialize the views variables
-        thumbnailView = findViewById(R.id.iv_thumbnail);
-        mPlayerView = findViewById(R.id.player_container);
-        errorMessageView = findViewById(R.id.tv_illustration_not_available_label);
+        ButterKnife.bind(this);
 
         // Recover the views state in case of device rotating
         if (savedInstanceState != null) {
