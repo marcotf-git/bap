@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity
 
 
     /**
-     * This is where we receive our callback from
+     * This is where we receive our callback from the recipe list adapter
      * {@link com.example.androidstudio.bakingapp.ui.RecipesListAdapter.ListItemClickListener}
      *
      * This callback is invoked when you click on an item in the list.
@@ -231,35 +231,11 @@ public class MainActivity extends AppCompatActivity
 
         Log.v(TAG, "onListItemClick clickedItemIndex:" + clickedItemIndex);
 
-        /*
-         * Storing the Context in a variable in this case is redundant since we could have
-         * just used "this" or "MainActivity.this" in the method call below. However, we
-         * wanted to demonstrate what parameter we were using "MainActivity.this" for as
-         * clear as possible.
-         */
+        // Start RecipeDetail activity passing the specific recipe JSON string
         Context context = MainActivity.this;
-
-        /* This is the class that we want to start (and open) when the item is clicked. */
         Class destinationActivity = RecipeDetailActivity.class;
-
-        /*
-         * Here, we create the Intent that will start the Activity we specified above in
-         * the destinationActivity variable. The constructor for an Intent also requires a
-         * context, which we stored in the variable named "context".
-         */
         Intent startChildActivityIntent = new Intent(context, destinationActivity);
-
-        /*
-         * We use the putExtra method of the Intent class to pass some extra stuff to the
-         * Activity that we are starting. Generally, this data is quite simple, such as
-         * a String or a number. However, there are ways to pass more complex objects.
-         */
         startChildActivityIntent.putExtra("recipeStringJSON", recipeStringJSON);
-
-        /*
-         * Once the Intent has been created, we can use Activity's method, "startActivity"
-         * to start the DetailActivity.
-         */
         startActivity(startChildActivityIntent);
 
     }

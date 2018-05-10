@@ -2,8 +2,8 @@
 
     <string name="app_name">BakingApp</string>
 
-    <string name="error_message">
-        Failed to get results. Please try again.
+    <string name="file_loading_error_message">
+        Failed to load the file with the recipes.
     </string>
 
     <string name="recipe_name">Recipe Name</string>
@@ -13,14 +13,6 @@
     <string name="step_description">Step Description</string>
     <string name="thumbnail_image">Thumbnail Image</string>
 
-    <string name="notification_text">Press play to hear the piece!</string>
-    <string name="sample_list_load_error">Error loading one or more samples!</string>
-    <string name="sample_not_found_error">Sample not found!</string>
-    <string name="play">Play</string>
-    <string name="pause">Pause</string>
-    <string name="restart">Restart</string>
-
     <string name="illustration_not_available">Illustration Not Available</string>
-
 
 </resources>

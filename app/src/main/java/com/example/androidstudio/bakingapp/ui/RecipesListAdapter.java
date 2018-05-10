@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
 import com.example.androidstudio.bakingapp.utilities.RecipesBox;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -108,18 +110,46 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         JSONObject recipeJSON = recipesBox.getRecipeJSON(position);
 
         final String recipeName;
+        final String imageURL;
 
         try {
 
             recipeName = recipeJSON.getString("name");
+            imageURL = recipeJSON.getString("image");
 
-            holder.recipeTextView.setText(recipeName);
-            holder.recipeTextView.setVisibility(View.VISIBLE);
+            if (recipeName != null && !recipeName.equals("")) {
+                holder.recipeTextView.setText(recipeName);
+                holder.recipeTextView.setVisibility(View.VISIBLE);
+            }
+
+            if (imageURL != null && !imageURL.equals("")) {
+                /*
+                 * Use the call back of picasso to manage the error in loading poster.
+                 * On error, write the message in the text view that is together with the
+                 * image view, and make it visible.
+                 */
+                Picasso.with(holder.context)
+                        .load(imageURL)
+                        .into(holder.recipeImageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Log.v(TAG, "Recipe image loaded.");
+                                holder.errorTextView.setVisibility(View.INVISIBLE);
+                            }
+
+                            @Override
+                            public void onError() {
+                                Log.e(TAG, "Error in loading recipe image.");
+                                holder.errorTextView.setVisibility(View.VISIBLE);
+                            }
+                        });
+            } else {
+                holder.errorTextView.setVisibility(View.VISIBLE);
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
 
     }
 
@@ -147,6 +177,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
 
         ImageView recipeImageView;
         TextView recipeTextView;
+        TextView errorTextView;
         Context context;
 
         /**
@@ -163,6 +194,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
             context = itemView.getContext();
             recipeImageView = (ImageView) itemView.findViewById(R.id.iv_main_recipe_image);
             recipeTextView = (TextView) itemView.findViewById(R.id.tv_main_recipe_image);
+            errorTextView = (TextView) itemView.findViewById(R.id.tv_recipe_image_error_message_label);
 
             // Call setOnClickListener on the View passed into the constructor (use 'this' as the OnClickListener)
             itemView.setOnClickListener(this);
@@ -182,6 +214,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
 
             Log.v(TAG, "onClick recipeJSON:" + recipeJSON.toString());
 
+            // Calls the method implemented in the main activity
             mOnClickListener.onListItemClick(clickedPosition, recipeJSON.toString());
         }
 
