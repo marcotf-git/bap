@@ -11,7 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.androidstudio.bakingapp.R;
-import com.example.androidstudio.bakingapp.utilities.Step;
+import com.example.androidstudio.bakingapp.data.Step;
 
 import java.util.ArrayList;
 

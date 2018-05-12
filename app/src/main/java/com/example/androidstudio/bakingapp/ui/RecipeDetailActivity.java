@@ -13,8 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
-import com.example.androidstudio.bakingapp.utilities.Ingredient;
-import com.example.androidstudio.bakingapp.utilities.Step;
+import com.example.androidstudio.bakingapp.data.Ingredient;
+import com.example.androidstudio.bakingapp.data.Step;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -39,15 +39,15 @@ public class RecipeDetailActivity extends AppCompatActivity
     public static final String STEP_NUMBER = "step";
 
     // Final strings to store views visibility state
-    public static final String PLAYER_VIEW_VISIBILIBITY = "player_view_visibility";
-    public static final String THUMBNAIL_VIEW_VISIBILIBITY = "thumbnail_view_visibility";
-    public static final String ERROR_VIEW_VISIBILIBITY = "error_view_visibility";
+    public static final String PLAYER_VIEW_VISIBILITY = "player_view_visibility";
+    public static final String THUMBNAIL_VIEW_VISIBILITY = "thumbnail_view_visibility";
+    public static final String ERROR_VIEW_VISIBILITY = "error_view_visibility";
 
     // The data vars of the recipe being viewed
     private String recipeStringJSON;
-    private String recipeName = "";
+    private String recipeName;
 
-    // The step being viewed
+    // The data vars of the step being viewed
     private int mStep;
     private JSONArray ingredientsJSON;
     private JSONArray stepsJSON;
@@ -94,9 +94,9 @@ public class RecipeDetailActivity extends AppCompatActivity
 
         // Recover the views state in case of device rotating
         if (savedInstanceState != null && mTwoPane) {
-            mPlayerView.setVisibility(savedInstanceState.getInt(PLAYER_VIEW_VISIBILIBITY));
-            thumbnailView.setVisibility(savedInstanceState.getInt(THUMBNAIL_VIEW_VISIBILIBITY));
-            errorMessageView.setVisibility(savedInstanceState.getInt(ERROR_VIEW_VISIBILIBITY));
+            mPlayerView.setVisibility(savedInstanceState.getInt(PLAYER_VIEW_VISIBILITY));
+            thumbnailView.setVisibility(savedInstanceState.getInt(THUMBNAIL_VIEW_VISIBILITY));
+            errorMessageView.setVisibility(savedInstanceState.getInt(ERROR_VIEW_VISIBILITY));
         }
 
         // Initialize the data vars for this class
@@ -351,9 +351,9 @@ public class RecipeDetailActivity extends AppCompatActivity
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putInt(STEP_NUMBER, mStep);
         if(mTwoPane) {
-            savedInstanceState.putInt(PLAYER_VIEW_VISIBILIBITY, mPlayerView.getVisibility());
-            savedInstanceState.putInt(THUMBNAIL_VIEW_VISIBILIBITY, thumbnailView.getVisibility());
-            savedInstanceState.putInt(ERROR_VIEW_VISIBILIBITY, errorMessageView.getVisibility());
+            savedInstanceState.putInt(PLAYER_VIEW_VISIBILITY, mPlayerView.getVisibility());
+            savedInstanceState.putInt(THUMBNAIL_VIEW_VISIBILITY, thumbnailView.getVisibility());
+            savedInstanceState.putInt(ERROR_VIEW_VISIBILITY, errorMessageView.getVisibility());
         }
         super.onSaveInstanceState(savedInstanceState);
     }

@@ -10,13 +10,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
-import com.example.androidstudio.bakingapp.utilities.RecipesBox;
+import com.example.androidstudio.bakingapp.data.RecipesBox;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.RecipeViewHolder>{
@@ -175,9 +177,9 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
     class RecipeViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
-        ImageView recipeImageView;
-        TextView recipeTextView;
-        TextView errorTextView;
+        @BindView(R.id.iv_main_recipe_image) ImageView recipeImageView;
+        @BindView(R.id.tv_main_recipe_name) TextView recipeTextView;
+        @BindView(R.id.tv_recipe_image_error_message_label) TextView errorTextView;
         Context context;
 
         /**
@@ -192,9 +194,8 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
             super(itemView);
 
             context = itemView.getContext();
-            recipeImageView = (ImageView) itemView.findViewById(R.id.iv_main_recipe_image);
-            recipeTextView = (TextView) itemView.findViewById(R.id.tv_main_recipe_image);
-            errorTextView = (TextView) itemView.findViewById(R.id.tv_recipe_image_error_message_label);
+            
+            ButterKnife.bind(this, itemView);
 
             // Call setOnClickListener on the View passed into the constructor (use 'this' as the OnClickListener)
             itemView.setOnClickListener(this);

@@ -1,4 +1,4 @@
-package com.example.androidstudio.bakingapp.utilities;
+package com.example.androidstudio.bakingapp.data;
 
 
 import org.json.JSONArray;

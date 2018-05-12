@@ -3,6 +3,10 @@ package com.example.androidstudio.bakingapp.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -15,9 +19,10 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.androidstudio.bakingapp.IdlingResource.SimpleIdlingResource;
 import com.example.androidstudio.bakingapp.R;
 import com.example.androidstudio.bakingapp.utilities.FileUtils;
-import com.example.androidstudio.bakingapp.utilities.RecipesBox;
+import com.example.androidstudio.bakingapp.data.RecipesBox;
 
 import java.io.IOException;
 
@@ -37,10 +42,26 @@ public class MainActivity extends AppCompatActivity
 
     @BindView(R.id.tv_error_message_display) TextView mErrorMessageDisplay;
     @BindView(R.id.pb_loading_indicator) ProgressBar mLoadingIndicator;
+    @BindView(R.id.rv_recipes) RecyclerView mRecipesList;
 
     private RecipesListAdapter mAdapter;
 
-    @BindView(R.id.rv_recipes) RecyclerView mRecipesList;
+
+    // The Idling Resource which will be null in production.
+    @Nullable
+    private SimpleIdlingResource mIdlingResource;
+
+    /**
+     * Only called from test, creates and returns a new {@link SimpleIdlingResource}.
+     */
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        return mIdlingResource;
+    }
 
 
     @Override
@@ -84,6 +105,21 @@ public class MainActivity extends AppCompatActivity
         int loaderId = RECIPES_LOADER_FROM_FILE_ID;
         LoaderManager.LoaderCallbacks<String> callback = MainActivity.this;
         Bundle bundleForLoader = null;
+
+        // Get the IdlingResource instance
+        getIdlingResource();
+
+        /*
+         * The IdlingResource is null in production as set by the @Nullable annotation which means
+         * the value is allowed to be null.
+         *
+         * If the idle state is true, Espresso can perform the next action.
+         * If the idle state is false, Espresso will wait until it is true before
+         * performing the next action.
+         */
+        if (mIdlingResource != null) {
+            mIdlingResource.setIdleState(false);
+        }
 
         getSupportLoaderManager().initLoader(loaderId, bundleForLoader, callback);
 
@@ -176,6 +212,11 @@ public class MainActivity extends AppCompatActivity
 
         } else {
             showErrorMessage();
+        }
+
+        // Set the idling resource for Espresso
+        if (mIdlingResource != null) {
+            mIdlingResource.setIdleState(true);
         }
     }
 

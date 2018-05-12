@@ -11,7 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
-import com.example.androidstudio.bakingapp.utilities.Ingredient;
+import com.example.androidstudio.bakingapp.data.Ingredient;
 
 import java.util.ArrayList;
 
