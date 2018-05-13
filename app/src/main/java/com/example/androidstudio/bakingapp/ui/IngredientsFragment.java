@@ -27,10 +27,9 @@ public class IngredientsFragment extends Fragment {
     public IngredientsFragment() {
     }
 
-
     /**
      * Inflates the fragment layout and sets any view resources
-      */
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 

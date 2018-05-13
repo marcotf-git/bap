@@ -38,7 +38,10 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    // This is for simulating a delay in the loader (it will set the view with delay)
+    /*
+     * This is for simulating a delay in the loader (it will set the view with delay)
+     * for illustration of Espresso idling resources test use.
+     */
     private static final int DELAY_MILLIS = 3000;
 
     /* This number will uniquely identify our Loader and is chosen arbitrarily. */
@@ -76,19 +79,7 @@ public class MainActivity extends AppCompatActivity
 
         ButterKnife.bind(this);
 
-        /*
-         * A LinearLayoutManager is responsible for measuring and positioning item views within a
-         * RecyclerView into a linear list. This means that it can produce either a horizontal or
-         * vertical list depending on which parameter you pass in to the LinearLayoutManager
-         * constructor. By default, if you don't specify an orientation, you get a vertical list.
-         * In our case, we want a vertical list, so we don't need to pass in an orientation flag to
-         * the LinearLayoutManager constructor.
-         *
-         * There are other LayoutManagers available to display your data in uniform grids,
-         * staggered grids, and more! See the developer documentation for more details.
-         *
-         * We are using the GridLayoutManager.
-         */
+        // Set the layout manager
         int nColumns = numberOfColumns();
         GridLayoutManager layoutManager = new GridLayoutManager(this, nColumns);
         mRecipesList.setLayoutManager(layoutManager);
@@ -202,11 +193,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<String> loader, String recipesStringJSON) {
 
-
         Log.v(TAG, "onLoadFinished loader id:" + loader.getId());
         Log.v(TAG, "onLoadFinished recipesJSONString:" + recipesStringJSON);
         Log.v(TAG, "onLoadFinished recipesJSONString size:" + recipesStringJSON.length());
-
 
         mLoadingIndicator.setVisibility(View.INVISIBLE);
 
@@ -223,9 +212,7 @@ public class MainActivity extends AppCompatActivity
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-
                     mAdapter.setRecipesData(recipesBox);
-
                     // Set the idling resource for Espresso
                     if (mIdlingResource != null) {
                         mIdlingResource.setIdleState(true);
@@ -233,11 +220,8 @@ public class MainActivity extends AppCompatActivity
                 }
             }, DELAY_MILLIS);
 
-
         } else {
-
             showErrorMessage();
-
             // Set the idling resource for Espresso
             if (mIdlingResource != null) {
                 mIdlingResource.setIdleState(true);
