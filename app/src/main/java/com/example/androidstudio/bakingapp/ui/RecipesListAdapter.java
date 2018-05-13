@@ -194,7 +194,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
             super(itemView);
 
             context = itemView.getContext();
-            
+
             ButterKnife.bind(this, itemView);
 
             // Call setOnClickListener on the View passed into the constructor (use 'this' as the OnClickListener)

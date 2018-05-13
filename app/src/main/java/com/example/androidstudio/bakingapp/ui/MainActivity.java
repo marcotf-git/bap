@@ -3,6 +3,7 @@ package com.example.androidstudio.bakingapp.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -36,6 +37,9 @@ public class MainActivity extends AppCompatActivity
 
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    // This is for simulating a delay in the loader (it will set the view with delay)
+    private static final int DELAY_MILLIS = 3000;
 
     /* This number will uniquely identify our Loader and is chosen arbitrarily. */
     private static final int RECIPES_LOADER_FROM_FILE_ID = 10;
@@ -198,26 +202,48 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<String> loader, String recipesStringJSON) {
 
+
         Log.v(TAG, "onLoadFinished loader id:" + loader.getId());
         Log.v(TAG, "onLoadFinished recipesJSONString:" + recipesStringJSON);
         Log.v(TAG, "onLoadFinished recipesJSONString size:" + recipesStringJSON.length());
+
 
         mLoadingIndicator.setVisibility(View.INVISIBLE);
 
         if (recipesStringJSON != null && !recipesStringJSON.equals("")) {
 
             showRecipesDataView();
-            RecipesBox recipesBox = new RecipesBox(recipesStringJSON);
-            mAdapter.setRecipesData(recipesBox);
+            final RecipesBox recipesBox = new RecipesBox(recipesStringJSON);
+
+            //mAdapter.setRecipesData(recipesBox);
+
+            // This is for simulating a delay in the loader (it will set the view with delay)
+            // for Espresso illustration of the idling resources use.
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    mAdapter.setRecipesData(recipesBox);
+
+                    // Set the idling resource for Espresso
+                    if (mIdlingResource != null) {
+                        mIdlingResource.setIdleState(true);
+                    }
+                }
+            }, DELAY_MILLIS);
+
 
         } else {
+
             showErrorMessage();
+
+            // Set the idling resource for Espresso
+            if (mIdlingResource != null) {
+                mIdlingResource.setIdleState(true);
+            }
         }
 
-        // Set the idling resource for Espresso
-        if (mIdlingResource != null) {
-            mIdlingResource.setIdleState(true);
-        }
     }
 
 
