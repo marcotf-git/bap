@@ -52,7 +52,7 @@ public class RecipeDetailActivityScreenTest {
     public void registerIdlingResource() {
         mIdlingResource = mActivityRule.getActivity().getIdlingResource();
         // To prove that the test fails, omit this call:
-        //Espresso.registerIdlingResources(mIdlingResource);
+        Espresso.registerIdlingResources(mIdlingResource);
 
     }
 
