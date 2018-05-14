@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
 import com.example.androidstudio.bakingapp.data.Ingredient;
+import com.example.androidstudio.bakingapp.data.RecipesContract;
 import com.example.androidstudio.bakingapp.data.Step;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -73,6 +74,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
+
 
         ButterKnife.bind(this);
 

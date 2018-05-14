@@ -11,7 +11,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <provider
             android:name=".data.RecipeContentProvider"
             android:authorities="com.example.androidstudio.bakingapp"
@@ -27,16 +26,23 @@
         <activity android:name=".ui.RecipeDetailActivity" />
         <activity android:name=".ui.StepDetailActivity" />
 
-        <receiver android:name=".ui.NewAppWidget">
+        <!-- The broadcast receiver that refers to the widget. -->
+        <receiver android:name=".widget.IngredientsWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/new_app_widget_info" />
+                android:resource="@xml/ingredients_widget_info" />
         </receiver>
 
+        <!-- The service that will send the collection data to the widget. -->
+        <service
+            android:name=".widget.WidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <activity android:name=".ui.IngredientsActivity"></activity>
     </application>
 
 </manifest>

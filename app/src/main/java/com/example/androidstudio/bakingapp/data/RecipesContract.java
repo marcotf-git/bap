@@ -20,6 +20,8 @@ public final class  RecipesContract {
     // This is the path for the "recipes" directory
     public static final String PATH_RECIPES = "recipes";
 
+    public static final int INVALID_RECIPE_ID = -1;
+
     // Empty constructor
     private RecipesContract() {}
 
