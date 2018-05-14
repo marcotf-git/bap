@@ -37,8 +37,8 @@ public class StepAdapter extends ArrayAdapter<Step> {
         // Get the {@link Word} object located at this position in the list
         Step currentStep = getItem(position);
 
-        TextView idView = (TextView) listItemView.findViewById(R.id.tv_step_id);
-        TextView shortDescriptionTextView = (TextView) listItemView.findViewById(R.id.tv_step_short_description);
+        TextView idView = listItemView.findViewById(R.id.tv_step_id);
+        TextView shortDescriptionTextView = listItemView.findViewById(R.id.tv_step_short_description);
 
         if (null != currentStep) {
 

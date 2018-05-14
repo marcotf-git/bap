@@ -79,12 +79,8 @@ public class RecipeDetailActivity extends AppCompatActivity
         ButterKnife.bind(this);
 
         // Determine if you are creating a two-pane or single-pane display
-        if(findViewById(R.id.view_tablet_linear_layout) != null) {
-            // This LinearLayout will only initially exists in the two-pane tablet case
-            mTwoPane = true;
-        } else {
-            mTwoPane = false;
-        }
+        // This LinearLayout will only initially exists in the two-pane tablet case
+        mTwoPane = findViewById(R.id.view_tablet_linear_layout) != null;
 
         // Reload the number of the step that was being viewed, in case of device rotating
         if (savedInstanceState == null) {

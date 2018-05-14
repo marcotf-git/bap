@@ -91,11 +91,7 @@ public class ExoPlayerFragment extends Fragment {
 
         playerView = rootView.findViewById(R.id.video_view);
 
-        if(null != getActivity().findViewById(R.id.view_activity_step_detail_landscape)) {
-            isLandscape = true;
-        } else {
-            isLandscape = false;
-        }
+        isLandscape = null != getActivity().findViewById(R.id.view_activity_step_detail_landscape);
 
         Log.v(TAG, "onCreateView isLandscape:" + isLandscape);
 

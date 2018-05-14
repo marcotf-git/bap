@@ -37,7 +37,7 @@ public class IngredientsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_ingredients, container, false);
 
         // Get a reference to the ingredients list
-        ListView listView = (ListView) rootView.findViewById(R.id.ingredients_list);
+        ListView listView = rootView.findViewById(R.id.ingredients_list);
 
         // Set the data to display
         IngredientAdapter ingredientAdapter = new IngredientAdapter(getContext(), mIngredients);

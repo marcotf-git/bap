@@ -37,9 +37,9 @@ public class IngredientAdapter extends ArrayAdapter<Ingredient> {
         // Get the {@link Word} object located at this position in the list
         Ingredient currentIngredient = getItem(position);
 
-        TextView quantityView = (TextView) listItemView.findViewById(R.id.tv_ingredient_quantity);
-        TextView measureTextView = (TextView) listItemView.findViewById(R.id.tv_ingredient_measure);
-        TextView nameTextView = (TextView) listItemView.findViewById(R.id.tv_ingredient_name);
+        TextView quantityView = listItemView.findViewById(R.id.tv_ingredient_quantity);
+        TextView measureTextView = listItemView.findViewById(R.id.tv_ingredient_measure);
+        TextView nameTextView = listItemView.findViewById(R.id.tv_ingredient_name);
 
         if (null != currentIngredient) {
 

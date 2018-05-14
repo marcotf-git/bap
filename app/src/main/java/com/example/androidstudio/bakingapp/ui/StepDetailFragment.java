@@ -41,7 +41,7 @@ public class StepDetailFragment extends Fragment {
         // Inflate the Steps fragment layout
         View rootView = inflater.inflate(R.layout.fragment_step_detail, container, false);
 
-        mDisplayStepDescription = (TextView) rootView.findViewById(R.id.tv_step_description);
+        mDisplayStepDescription = rootView.findViewById(R.id.tv_step_description);
         mDisplayStepDescription.setText(description);
 
         // Return root view

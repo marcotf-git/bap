@@ -84,7 +84,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
 
-        View view = (View) inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
+        View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
         RecipeViewHolder viewHolder = new RecipeViewHolder(view);
 
         viewHolderCount++;

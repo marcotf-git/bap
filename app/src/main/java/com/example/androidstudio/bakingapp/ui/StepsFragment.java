@@ -57,7 +57,7 @@ public class StepsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_steps, container, false);
 
         // Get a reference to the steps list
-        ListView listView = (ListView) rootView.findViewById(R.id.steps_list);
+        ListView listView = rootView.findViewById(R.id.steps_list);
 
         // Set the data to display
         StepAdapter stepAdapter = new StepAdapter(getContext(), mSteps);
