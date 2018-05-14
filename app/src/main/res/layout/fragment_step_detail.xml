@@ -6,17 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!--TextView
-        android:id="@+id/tv_step_description_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/step_description"
-        android:padding="16dp"
-        android:textSize="@dimen/step_text_size"
-        android:text="@string/step_description"
-        android:layout_marginLeft="32dp"
-        android:layout_marginRight="32dp"/-->
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

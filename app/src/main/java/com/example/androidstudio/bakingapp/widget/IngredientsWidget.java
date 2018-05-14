@@ -21,7 +21,7 @@ public class IngredientsWidget extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ingredients_widget);
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_ingredients);
 //        views.setTextViewText(R.id.appwidget_text, widgetText);
 
         // Set the IngredientsActivity intent to launch when clicked.
