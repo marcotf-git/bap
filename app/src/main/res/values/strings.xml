@@ -19,5 +19,6 @@
     <string name="widget_header">Recipes</string>
     <string name="prev">Prev</string>
     <string name="next">Next</string>
+    <string name="widget_image">Widget Image</string>
 
 </resources>
