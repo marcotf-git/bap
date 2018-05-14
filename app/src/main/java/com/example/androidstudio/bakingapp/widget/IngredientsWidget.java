@@ -12,6 +12,7 @@ import android.widget.RemoteViews;
 
 import com.example.androidstudio.bakingapp.R;
 import com.example.androidstudio.bakingapp.ui.IngredientsActivity;
+import com.example.androidstudio.bakingapp.ui.MainActivity;
 
 /**
  * Implementation of App Widget functionality.
@@ -32,8 +33,17 @@ public class IngredientsWidget extends AppWidgetProvider {
                 context,
                 0,
                 appIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_CANCEL_CURRENT);
         views.setPendingIntentTemplate(R.id.widget_list, appPendingIntent);
+
+        // Set the widget title to launch the MainActivity
+        Intent appMainIntent = new Intent(context, MainActivity.class);
+        PendingIntent appMainPendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                appMainIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+        views.setOnClickPendingIntent(R.id.tv_widget_title, appMainPendingIntent);
 
         // Set up the collection
         // Set the WidgetService intent to act as the adapter for the list view

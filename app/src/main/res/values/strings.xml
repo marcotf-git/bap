@@ -16,7 +16,7 @@
     <string name="illustration_not_available">Illustration Not Available</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
-    <string name="widget_header">Recipes</string>
+    <string name="widget_header">BakingApp recipes</string>
     <string name="prev">Prev</string>
     <string name="next">Next</string>
     <string name="widget_image">Widget Image</string>
