@@ -25,9 +25,11 @@ public class IngredientsWidget extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_ingredients);
 //        views.setTextViewText(R.id.appwidget_text, widgetText);
 
-        // Set the IngredientsActivity intent to launch when clicked.
-        // This is the template that will be completed in the WidgetDataProvider getViewAt method
-        // with the specific data for the item.
+        /*
+         * Set the IngredientsActivity intent to launch when clicked.
+         * This is the template that will be completed in the WidgetDataProvider getViewAt method
+         * with the specific data for the item.
+         */
         Intent appIntent = new Intent(context, IngredientsActivity.class);
         PendingIntent appPendingIntent = PendingIntent.getActivity(
                 context,

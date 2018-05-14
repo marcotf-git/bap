@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">BakingApp</string>
+    <string name="app_name">Baking App</string>
 
     <string name="file_loading_error_message">
         Failed to load the file with the recipes.
@@ -16,7 +16,7 @@
     <string name="illustration_not_available">Illustration Not Available</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
-    <string name="widget_header">BakingApp recipes</string>
+    <string name="widget_header">Baking App recipes</string>
     <string name="prev">Prev</string>
     <string name="next">Next</string>
     <string name="widget_image">Widget Image</string>
