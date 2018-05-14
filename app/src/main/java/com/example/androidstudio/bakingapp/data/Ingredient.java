@@ -1,31 +1,50 @@
 package com.example.androidstudio.bakingapp.data;
 
-/**
- * This class will store the ingredient
- */
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 public class Ingredient {
 
-    private int mQuantity;
-    private String mMeasure;
-    private String mIngredient;
+    @SerializedName("quantity")
+    @Expose
+    private Double quantity;
+    @SerializedName("measure")
+    @Expose
+    private String measure;
+    @SerializedName("ingredient")
+    @Expose
+    private String ingredient;
 
-    public Ingredient(int quantity, String measure, String ingredient) {
-        mQuantity = quantity;
-        mMeasure = measure;
-        mIngredient = ingredient;
+    public Double getQuantity() {
+        return quantity;
     }
 
-    public int getIngredientQuantity() {
-        return mQuantity;
+    public void setQuantity(Double quantity) {
+        this.quantity = quantity;
     }
 
-    public String getIngredientMeasure() {
-        return mMeasure;
+    public String getMeasure() {
+        return measure;
+    }
+
+    public void setMeasure(String measure) {
+        this.measure = measure;
     }
 
     public String getIngredient() {
-        return mIngredient;
+        return ingredient;
     }
 
+    public void setIngredient(String ingredient) {
+        this.ingredient = ingredient;
+    }
+
+    @Override
+    public String toString() {
+        return "Ingredient{" +
+                "quantity=" + quantity +
+                ", measure='" + measure + '\'' +
+                ", ingredient='" + ingredient + '\'' +
+                '}';
+    }
 }

@@ -1,43 +1,74 @@
 package com.example.androidstudio.bakingapp.data;
 
-/**
- * This class will store the step
- */
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 public class Step {
 
-    private int mId;
-    private String mShortDescription;
-    private String mDescription;
-    private String mVideoURL;
-    private String mThumbnailURL;
+    @SerializedName("id")
+    @Expose
+    private Integer id;
+    @SerializedName("shortDescription")
+    @Expose
+    private String shortDescription;
+    @SerializedName("description")
+    @Expose
+    private String description;
+    @SerializedName("videoURL")
+    @Expose
+    private String videoURL;
+    @SerializedName("thumbnailURL")
+    @Expose
+    private String thumbnailURL;
 
-    public Step(int id, String shortDescription, String description, String videoURL, String thumbnailURL) {
-
-        mId = id;
-        mShortDescription = shortDescription;
-        mDescription = description;
-        mVideoURL = videoURL;
-        mThumbnailURL = thumbnailURL;
+    public Integer getId() {
+        return id;
     }
 
-    public int getId() {
-        return mId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getShortDescription() {
-        return mShortDescription;
+        return shortDescription;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
     }
 
     public String getDescription() {
-        return mDescription;
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getVideoURL() {
-        return mVideoURL;
+        return videoURL;
+    }
+
+    public void setVideoURL(String videoURL) {
+        this.videoURL = videoURL;
     }
 
     public String getThumbnailURL() {
-        return mThumbnailURL;
+        return thumbnailURL;
     }
 
+    public void setThumbnailURL(String thumbnailURL) {
+        this.thumbnailURL = thumbnailURL;
+    }
+
+    @Override
+    public String toString() {
+        return "Step{" +
+                "id=" + id +
+                ", shortDescription='" + shortDescription + '\'' +
+                ", description='" + description + '\'' +
+                ", videoURL='" + videoURL + '\'' +
+                ", thumbnailURL='" + thumbnailURL + '\'' +
+                '}';
+    }
 }

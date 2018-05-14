@@ -80,8 +80,8 @@ public class IngredientsActivity extends AppCompatActivity {
                 ingredientQuantity = jsonObject.getInt("quantity");
                 ingredientMeasure = jsonObject.getString("measure");
                 ingredientName = jsonObject.getString("ingredient");
-                Ingredient ingredient = new Ingredient(ingredientQuantity, ingredientMeasure, ingredientName);
-                ingredients.add(ingredient);
+                //Ingredient ingredient = new Ingredient(ingredientQuantity, ingredientMeasure, ingredientName);
+                //ingredients.add(ingredient);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -43,8 +43,8 @@ public class IngredientAdapter extends ArrayAdapter<Ingredient> {
 
         if (null != currentIngredient) {
 
-            quantityView.setText(String.valueOf(currentIngredient.getIngredientQuantity()));
-            measureTextView.setText(currentIngredient.getIngredientMeasure());
+            //quantityView.setText(String.valueOf(currentIngredient.getIngredientQuantity()));
+            //measureTextView.setText(currentIngredient.getIngredientMeasure());
             nameTextView.setText(currentIngredient.getIngredient());
 
             Log.v("getView", "setting text:" + currentIngredient.getIngredient());

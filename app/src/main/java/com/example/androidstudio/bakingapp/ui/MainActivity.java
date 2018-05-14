@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.IdlingResource.SimpleIdlingResource;
 import com.example.androidstudio.bakingapp.R;
+import com.example.androidstudio.bakingapp.utilities.Controller;
 import com.example.androidstudio.bakingapp.utilities.DatabaseUtil;
 import com.example.androidstudio.bakingapp.data.RecipesContract;
 import com.example.androidstudio.bakingapp.data.RecipesDbHelper;
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity
     private static final int DELAY_MILLIS = 500;
 
     /* This number will uniquely identify our Loader and is chosen arbitrarily. */
-    private static final int RECIPES_LOADER_FROM_FILE_ID = 10;
+    private static final int RECIPES_LOADER_FROM_HTTP_ID = 10;
 
     @BindView(R.id.tv_error_message_display) TextView mErrorMessageDisplay;
     @BindView(R.id.pb_loading_indicator) ProgressBar mLoadingIndicator;
@@ -88,6 +89,11 @@ public class MainActivity extends AppCompatActivity
 
         ButterKnife.bind(this);
 
+//        Controller controller = new Controller();
+//        controller.start();
+//
+//        finish();
+
         // Set the layout manager
         int nColumns = numberOfColumns();
         GridLayoutManager layoutManager = new GridLayoutManager(this, nColumns);
@@ -106,7 +112,7 @@ public class MainActivity extends AppCompatActivity
         mRecipesList.setAdapter(mAdapter);
 
         // Loads the recipes in the adapter
-        int loaderId = RECIPES_LOADER_FROM_FILE_ID;
+        int loaderId = RECIPES_LOADER_FROM_HTTP_ID;
         LoaderManager.LoaderCallbacks<String> callback = MainActivity.this;
         Bundle bundleForLoader = null;
 

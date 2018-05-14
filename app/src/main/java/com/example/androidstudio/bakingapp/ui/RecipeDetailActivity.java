@@ -159,8 +159,8 @@ public class RecipeDetailActivity extends AppCompatActivity
                 ingredientQuantity = jsonObject.getInt("quantity");
                 ingredientMeasure = jsonObject.getString("measure");
                 ingredientName = jsonObject.getString("ingredient");
-                Ingredient ingredient = new Ingredient(ingredientQuantity, ingredientMeasure, ingredientName);
-                ingredients.add(ingredient);
+                //Ingredient ingredient = new Ingredient(ingredientQuantity, ingredientMeasure, ingredientName);
+                //ingredients.add(ingredient);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -207,8 +207,8 @@ public class RecipeDetailActivity extends AppCompatActivity
                 description = jsonObject.getString("description");
                 videoURL = jsonObject.getString("videoURL");
                 thumbnailURL = jsonObject.getString("thumbnailURL");
-                Step step = new Step(id, shortDescription, description, videoURL, thumbnailURL);
-                steps.add(step);
+                //Step step = new Step(id, shortDescription, description, videoURL, thumbnailURL);
+                //steps.add(step);
             } catch (Exception e) {
                 e.printStackTrace();
             }
