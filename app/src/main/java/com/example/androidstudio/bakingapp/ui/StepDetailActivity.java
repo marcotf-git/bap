@@ -136,17 +136,17 @@ public class StepDetailActivity extends AppCompatActivity {
                 .add(R.id.step_detail_container, stepDetailFragment)
                 .commit();
 
-        // Create a new PlayerFragment instance and display it using FragmentManager
+        // Create a new ExoPlayerFragment instance and display it using FragmentManager
         // or try to load and show the Thumbnail
         if (!videoURL.equals("")) {
 
-            PlayerFragment playerFragment = new PlayerFragment();
+            ExoPlayerFragment exoPlayerFragment = new ExoPlayerFragment();
             // Set the fragment data
-            playerFragment.setMediaUrl(videoURL);
+            exoPlayerFragment.setMediaUrl(videoURL);
             // Use a FragmentManager and transaction to add the fragment to the screen
             FragmentManager playerFragmentManager = getSupportFragmentManager();
             playerFragmentManager.beginTransaction()
-                    .add(R.id.player_container, playerFragment)
+                    .add(R.id.player_container, exoPlayerFragment)
                     .commit();
             mPlayerView.setVisibility(View.VISIBLE);
 

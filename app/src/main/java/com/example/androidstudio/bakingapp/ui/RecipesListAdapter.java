@@ -109,6 +109,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
 
         Log.d(TAG, "#" + position);
 
+
         JSONObject recipeJSON = recipesBox.getRecipeJSON(position);
 
         final String recipeName;
@@ -152,7 +153,6 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
 

@@ -35,9 +35,9 @@ import com.google.android.exoplayer2.util.Util;
  * the activity. The class will retain the status while rotating the device, and uses MediaSession
  * in sync with the Player, to receive commands from external clients. like headphones.
  */
-public class PlayerFragment extends Fragment {
+public class ExoPlayerFragment extends Fragment {
 
-    private static final String TAG = PlayerFragment.class.getSimpleName();
+    private static final String TAG = ExoPlayerFragment.class.getSimpleName();
 
     private static final DefaultBandwidthMeter BANDWIDTH_METER =
             new DefaultBandwidthMeter();
@@ -56,7 +56,7 @@ public class PlayerFragment extends Fragment {
     private String mediaUrl;
 
 
-    public PlayerFragment() {
+    public ExoPlayerFragment() {
         // Required empty public constructor
     }
 

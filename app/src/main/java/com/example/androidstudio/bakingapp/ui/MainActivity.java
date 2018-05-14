@@ -1,7 +1,10 @@
 package com.example.androidstudio.bakingapp.ui;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -22,8 +25,14 @@ import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.IdlingResource.SimpleIdlingResource;
 import com.example.androidstudio.bakingapp.R;
+import com.example.androidstudio.bakingapp.utilities.DatabaseUtil;
+import com.example.androidstudio.bakingapp.data.RecipesContract;
+import com.example.androidstudio.bakingapp.data.RecipesDbHelper;
 import com.example.androidstudio.bakingapp.utilities.FileUtils;
 import com.example.androidstudio.bakingapp.data.RecipesBox;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -42,7 +51,7 @@ public class MainActivity extends AppCompatActivity
      * This is for simulating a delay in the loader (it will set the view with delay)
      * for illustration of Espresso idling resources test use.
      */
-    private static final int DELAY_MILLIS = 3000;
+    private static final int DELAY_MILLIS = 500;
 
     /* This number will uniquely identify our Loader and is chosen arbitrarily. */
     private static final int RECIPES_LOADER_FROM_FILE_ID = 10;
@@ -204,6 +213,11 @@ public class MainActivity extends AppCompatActivity
             showRecipesDataView();
             final RecipesBox recipesBox = new RecipesBox(recipesStringJSON);
 
+            // Save the data in a new local database, for being used by the app widget.
+            // The widget needs a persistent data storage.
+            deleteDatabase();
+            insertDataInDatabase(recipesBox);
+
             //mAdapter.setRecipesData(recipesBox);
 
             // This is for simulating a delay in the loader (it will set the view with delay)
@@ -213,7 +227,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void run() {
                     mAdapter.setRecipesData(recipesBox);
-                    // Set the idling resource for Espresso
+                    // Set the idling resource for Espresso (now the app is in idle state)
                     if (mIdlingResource != null) {
                         mIdlingResource.setIdleState(true);
                     }
@@ -303,4 +317,63 @@ public class MainActivity extends AppCompatActivity
 
         return nColumns;
     }
+
+
+    private void deleteDatabase() {
+
+        RecipesDbHelper dbHelper = new RecipesDbHelper(this);
+        SQLiteDatabase mDb = dbHelper.getWritableDatabase();
+        DatabaseUtil.deleteDatabase(mDb);
+        mDb.close();
+    }
+
+
+    private void insertDataInDatabase(RecipesBox recipesBox) {
+
+        // Get the content resolver
+        ContentResolver resolver = getContentResolver();
+
+        // This is necessary to pass the values
+        ContentValues cv = new ContentValues();
+
+        int numberOfRecipes = recipesBox.getNumberOfRecipes();
+
+        for (int i=0; i < numberOfRecipes; i++) {
+
+            JSONObject recipeJSON = recipesBox.getRecipeJSON(i);
+
+            final int recipeId;
+            final String name;
+            final String ingredientsJSON;
+            final String stepsJSON;
+            final int servings;
+            final String imageURL;
+
+            try {
+
+                recipeId = recipeJSON.getInt("id");
+                name = recipeJSON.getString("name");
+                ingredientsJSON = recipeJSON.getString("ingredients");
+                stepsJSON = recipeJSON.getString("steps");
+                servings = recipeJSON.getInt("servings");
+                imageURL = recipeJSON.getString("image");
+
+                cv.put(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_ID, recipeId);
+                cv.put(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_NAME, name);
+                cv.put(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_INGREDIENTS_JSON, ingredientsJSON);
+                cv.put(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_STEPS_JSON, stepsJSON);
+                cv.put(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_SERVINGS, servings);
+                cv.put(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_IMAGE, imageURL);
+
+                // Call the insert method on the resolver with the correct Uri from the contract class
+                resolver.insert(RecipesContract.RecipeslistEntry.CONTENT_URI, cv);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
 }

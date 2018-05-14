@@ -4,9 +4,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.androidstudio.bakingapp.data.RecipeslistContract.RecipeslistEntry;
+import com.example.androidstudio.bakingapp.data.RecipesContract.RecipeslistEntry;
 
-public class RecipeslistDbHelper extends SQLiteOpenHelper {
+public class RecipesDbHelper extends SQLiteOpenHelper {
 
     // The database name
     private static final String DATABASE_NAME = "recipeslist.db";
@@ -15,7 +15,7 @@ public class RecipeslistDbHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Constructor
-    public RecipeslistDbHelper(Context context) {
+    public RecipesDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

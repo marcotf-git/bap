@@ -8,7 +8,7 @@ import android.provider.BaseColumns;
  * Thia class will store the database contract schema names
  */
 
-public final class RecipeslistContract {
+public final class  RecipesContract {
 
     // The authority, which is how your code knows which Content Provider to access
     public static final String AUTHORITY = "com.example.androidstudio.bakingapp";
@@ -21,7 +21,7 @@ public final class RecipeslistContract {
     public static final String PATH_RECIPES = "recipes";
 
     // Empty constructor
-    private RecipeslistContract() {}
+    private RecipesContract() {}
 
     public static class RecipeslistEntry implements BaseColumns {
 

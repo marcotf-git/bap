@@ -276,14 +276,14 @@ public class RecipeDetailActivity extends AppCompatActivity
 
         if (mStepVideoURL != null && (!mStepVideoURL.equals(""))) {
 
-            PlayerFragment playerFragment = new PlayerFragment();
+            ExoPlayerFragment exoPlayerFragment = new ExoPlayerFragment();
             // Set the fragment data
-            playerFragment.setMediaUrl(mStepVideoURL);
+            exoPlayerFragment.setMediaUrl(mStepVideoURL);
             // Use a FragmentManager and transaction to add the fragment to the screen
             FragmentManager playerFragmentManager = getSupportFragmentManager();
             // Use a FragmentManager and transaction to add the fragment to the screen
             playerFragmentManager.beginTransaction()
-                    .add(R.id.player_container, playerFragment)
+                    .add(R.id.player_container, exoPlayerFragment)
                     .commit();
             mPlayerView.setVisibility(View.VISIBLE);
 

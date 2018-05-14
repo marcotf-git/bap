@@ -40,14 +40,14 @@ public class RecipeContentProvider extends ContentProvider {
           For each kind of uri you may want to access, add the corresponding match with addURI.
           The two calls below add matches for the recipes directory and a single item by ID.
          */
-        uriMatcher.addURI(RecipeslistContract.AUTHORITY, RecipeslistContract.PATH_RECIPES, RECIPES);
-        uriMatcher.addURI(RecipeslistContract.AUTHORITY, RecipeslistContract.PATH_RECIPES + "/#", RECIPE_WITH_RECIPE_ID);
+        uriMatcher.addURI(RecipesContract.AUTHORITY, RecipesContract.PATH_RECIPES, RECIPES);
+        uriMatcher.addURI(RecipesContract.AUTHORITY, RecipesContract.PATH_RECIPES + "/#", RECIPE_WITH_RECIPE_ID);
 
         return uriMatcher;
     }
 
-    // Member variable for a RecipeslistDbHelper that's initialized in the onCreate() method
-    private RecipeslistDbHelper mRecipeDbHelper;
+    // Member variable for a RecipesDbHelper that's initialized in the onCreate() method
+    private RecipesDbHelper mRecipeDbHelper;
 
 
     /*  onCreate() is where you should initialize anything you’ll need to setup
@@ -58,7 +58,7 @@ public class RecipeContentProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         Context context = getContext();
-        mRecipeDbHelper = new RecipeslistDbHelper(context);
+        mRecipeDbHelper = new RecipesDbHelper(context);
         return true;
     }
 
@@ -77,10 +77,10 @@ public class RecipeContentProvider extends ContentProvider {
             case RECIPES:
                 // Insert new values into the database
                 // Inserting values into movies table
-                long id = db.insert(RecipeslistContract.RecipeslistEntry.TABLE_NAME,
+                long id = db.insert(RecipesContract.RecipeslistEntry.TABLE_NAME,
                         null, values);
                 if ( id > 0 ) {
-                    returnUri = ContentUris.withAppendedId(RecipeslistContract.RecipeslistEntry.CONTENT_URI, id);
+                    returnUri = ContentUris.withAppendedId(RecipesContract.RecipeslistEntry.CONTENT_URI, id);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
@@ -115,7 +115,7 @@ public class RecipeContentProvider extends ContentProvider {
         switch (match) {
             // Query for the movies directory
             case RECIPES:
-                retCursor =  db.query(RecipeslistContract.RecipeslistEntry.TABLE_NAME,
+                retCursor =  db.query(RecipesContract.RecipeslistEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
