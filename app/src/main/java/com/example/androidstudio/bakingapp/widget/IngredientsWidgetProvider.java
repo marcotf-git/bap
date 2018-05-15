@@ -62,6 +62,7 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
     @Override
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
+
     }
 
     /**

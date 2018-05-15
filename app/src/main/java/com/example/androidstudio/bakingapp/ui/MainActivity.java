@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -412,4 +413,20 @@ public class MainActivity extends AppCompatActivity implements
         startActivity(getIntent());
     }
 
+    
+    @Override
+    protected void onDestroy() {
+
+        // Clear the widget
+        ListRemoteViewsFactory.setWidgetProviderData("");
+
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, IngredientsWidgetProvider.class));
+        //Trigger data update to handle the GridView widgets and force a data refresh
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
+        //Now update all widgets
+        IngredientsWidgetProvider.updateIngredientsWidgets(this, appWidgetManager, "", appWidgetIds);
+
+        super.onDestroy();
+    }
 }
