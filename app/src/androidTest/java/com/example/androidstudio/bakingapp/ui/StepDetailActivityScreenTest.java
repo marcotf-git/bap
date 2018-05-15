@@ -24,6 +24,7 @@ import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -73,9 +74,12 @@ public class StepDetailActivityScreenTest {
         onView(ViewMatchers.withId(R.id.steps_list))
                 .perform(ViewActions.scrollTo());
 
-        onData(stepWithDescription(FIRST_STEP))
-                .inAdapterView(withId(R.id.steps_list))
-                .perform(click());
+        onView(ViewMatchers.withId(R.id.steps_list))
+                .perform(RecyclerViewActions.actionOnItemAtPosition(ITEM, click()));
+
+//        onData(stepWithDescription(FIRST_STEP))
+//                .inAdapterView(withId(R.id.steps_list))
+//                .perform(click());
 
         onView(ViewMatchers.withId(R.id.tv_step_description))
                 .check(matches(withText(FIRST_STEP_DESCRIPTION)));
@@ -92,17 +96,17 @@ public class StepDetailActivityScreenTest {
     }
 
     // Matcher for the step
-    public static Matcher<Object> stepWithDescription(final String description) {
-        return new BoundedMatcher<Object, Step>(Step.class) {
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("has description " + description);
-            }
-            @Override
-            public boolean matchesSafely(Step step) {
-                return step.getShortDescription().equals(description);
-            }
-        };
-    }
+//    public static Matcher<Object> stepWithDescription(final String description) {
+//        return new BoundedMatcher<Object, Step>(Step.class) {
+//            @Override
+//            public void describeTo(Description description) {
+//                description.appendText("has description " + description);
+//            }
+//            @Override
+//            public boolean matchesSafely(Step step) {
+//                return step.getShortDescription().equals(description);
+//            }
+//        };
+//    }
 
 }

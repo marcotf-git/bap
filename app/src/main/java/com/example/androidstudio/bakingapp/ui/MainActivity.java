@@ -322,6 +322,9 @@ public class MainActivity extends AppCompatActivity implements
         // Try to handle error on loading
         if(recipes == null){
             showErrorMessage();
+            if (mIdlingResource != null) {
+                mIdlingResource.setIdleState(true);
+            }
             return;
         }
 
@@ -385,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements
         mAdapter.setRecipesCursorData(data);
 
         if (mIdlingResource != null) {
-            mIdlingResource.setIdleState(false);
+            mIdlingResource.setIdleState(true);
         }
 
         showRecipesDataView();

@@ -27,6 +27,7 @@ import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -60,22 +61,29 @@ public class RecipeDetailActivityScreenTest {
      * Go to the first recipe detail screen and check if the first ingredient is shown.
      */
     @Test
-    public void testIfFirstIngredientAndFirstStepIsShown() {
+    public void testIfFirstIngredientIsShown() {
 
         onView(ViewMatchers.withId(R.id.rv_recipes))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(ITEM, click()));
 
         onView(withText(RECIPE_NAME)).check(matches(isDisplayed()));
 
-        onData(ingredientWithName(FIRST_INGREDIENT))
-                .inAdapterView(withId(R.id.ingredients_list))
-                .check(matches(isDisplayed()));
+        onView(ViewMatchers.withId(R.id.ingredients_list))
+                .perform(ViewActions.scrollTo());
+
+        onView(ViewMatchers.withId(R.id.ingredients_list))
+                .perform(RecyclerViewActions.scrollToPosition(ITEM))
+                .check(matches(hasDescendant(withText(FIRST_INGREDIENT))));
+
+//        onData(ingredientWithName(FIRST_INGREDIENT))
+//                .inAdapterView(withId(R.id.ingredients_list))
+//                .check(matches(isDisplayed()));
 
     }
 
 
     /**
-     * Go to the first recipe detail screen and check if the first step short description is shown.
+     * Go to the first recipe detail screen and check if the first step is shown.
      */
     @Test
     public void testIfFirstStepIsShown() {
@@ -85,14 +93,16 @@ public class RecipeDetailActivityScreenTest {
 
         onView(withText(RECIPE_NAME)).check(matches(isDisplayed()));
 
+
         onView(ViewMatchers.withId(R.id.steps_list))
                 .perform(ViewActions.scrollTo());
 
-        onData(stepWithDescription(FIRST_STEP))
-                .inAdapterView(withId(R.id.steps_list))
-                .check(matches(isDisplayed()));
+        onView(ViewMatchers.withId(R.id.steps_list))
+                .perform(RecyclerViewActions.scrollToPosition(ITEM))
+                .check(matches(hasDescendant(withText(FIRST_STEP))));
 
     }
+
 
     // Unregister resources when not needed to avoid malfunction.
     @After
@@ -103,31 +113,31 @@ public class RecipeDetailActivityScreenTest {
     }
 
     // Matcher for the ingredient
-    public static Matcher<Object> ingredientWithName(final String name) {
-        return new BoundedMatcher<Object, Ingredient>(Ingredient.class) {
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("has name " + name);
-            }
-            @Override
-            public boolean matchesSafely(Ingredient ingredient) {
-                return ingredient.getIngredient().equals(name);
-            }
-        };
-    }
+//    public static Matcher<Object> ingredientWithName(final String name) {
+//        return new BoundedMatcher<Object, Ingredient>(Ingredient.class) {
+//            @Override
+//            public void describeTo(Description description) {
+//                description.appendText("has name " + name);
+//            }
+//            @Override
+//            public boolean matchesSafely(Ingredient ingredient) {
+//                return ingredient.getIngredient().equals(name);
+//            }
+//        };
+//    }
 
     // Matcher for the step
-    public static Matcher<Object> stepWithDescription(final String description) {
-        return new BoundedMatcher<Object, Step>(Step.class) {
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("has description " + description);
-            }
-            @Override
-            public boolean matchesSafely(Step step) {
-                return step.getShortDescription().equals(description);
-            }
-        };
-    }
+//    public static Matcher<Object> stepWithDescription(final String description) {
+//        return new BoundedMatcher<Object, Step>(Step.class) {
+//            @Override
+//            public void describeTo(Description description) {
+//                description.appendText("has description " + description);
+//            }
+//            @Override
+//            public boolean matchesSafely(Step step) {
+//                return step.getShortDescription().equals(description);
+//            }
+//        };
+//    }
 
 }
