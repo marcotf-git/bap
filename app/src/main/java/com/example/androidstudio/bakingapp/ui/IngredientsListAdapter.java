@@ -1,6 +1,7 @@
 package com.example.androidstudio.bakingapp.ui;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -61,8 +62,9 @@ public class IngredientsListAdapter extends RecyclerView.Adapter<IngredientsList
      *                  for more details.
      * @return A new NumberViewHolder that holds the View for each list item
      */
+    @NonNull
     @Override
-    public IngredientsListAdapter.IngredientViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public IngredientsListAdapter.IngredientViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
 
         Context context = viewGroup.getContext();
 
@@ -91,7 +93,7 @@ public class IngredientsListAdapter extends RecyclerView.Adapter<IngredientsList
      * @param position The position of the item within the adapter's data set.
      */
     @Override
-    public void onBindViewHolder(final IngredientsListAdapter.IngredientViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final IngredientsListAdapter.IngredientViewHolder holder, int position) {
 
         Log.d(TAG, "onBindViewHolder #" + position);
 
@@ -142,7 +144,7 @@ public class IngredientsListAdapter extends RecyclerView.Adapter<IngredientsList
         @BindView(R.id.tv_ingredient_quantity) TextView quantityTextView;
         @BindView(R.id.tv_ingredient_measure) TextView measureTextView;
         @BindView(R.id.tv_ingredient_name)  TextView ingredientNameTextView;
-        Context context;
+        final Context context;
 
         /**
          * Constructor for our ViewHolder. Within this constructor, we get a reference to our

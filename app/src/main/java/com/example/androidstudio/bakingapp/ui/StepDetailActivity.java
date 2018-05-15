@@ -30,9 +30,9 @@ public class StepDetailActivity extends AppCompatActivity {
     private static final String TAG = StepDetailActivity.class.getSimpleName();
 
     // Final strings to store views visibility state
-    public static final String PLAYER_VIEW_VISIBILITY = "player_view_visibility";
-    public static final String THUMBNAIL_VIEW_VISIBILITY = "thumbnail_view_visibility";
-    public static final String ERROR_VIEW_VISIBILITY = "error_view_visibility";
+    private static final String PLAYER_VIEW_VISIBILITY = "player_view_visibility";
+    private static final String THUMBNAIL_VIEW_VISIBILITY = "thumbnail_view_visibility";
+    private static final String ERROR_VIEW_VISIBILITY = "error_view_visibility";
 
     // The data vars of the recipe being viewed
     private String stepsJSONString;
@@ -44,9 +44,12 @@ public class StepDetailActivity extends AppCompatActivity {
     private String thumbnailURL;
 
     // The views variables
-    @BindView(R.id.player_container) View mPlayerView;
-    @BindView(R.id.iv_thumbnail) ImageView thumbnailView;
-    @BindView(R.id.tv_illustration_not_available_label) TextView errorMessageView;
+    @BindView(R.id.player_container)
+    View mPlayerView;
+    @BindView(R.id.iv_thumbnail)
+    ImageView thumbnailView;
+    @BindView(R.id.tv_illustration_not_available_label)
+    TextView errorMessageView;
 
 
     @Override
@@ -220,10 +223,5 @@ public class StepDetailActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-    }
 
 }

@@ -3,7 +3,7 @@ package com.example.androidstudio.bakingapp.data;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Step {
+class Step {
 
     @SerializedName("id")
     @Expose

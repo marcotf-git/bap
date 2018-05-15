@@ -19,8 +19,8 @@ public class RecipeContentProvider extends ContentProvider {
     // Define final integer constants for the directory of recipes and a single item.
     // It's convention to use 100, 200, 300, etc for directories,
     // and related ints (101, 102, ..) for items in that directory.
-    public static final int RECIPES = 100;
-    public static final int RECIPE_WITH_RECIPE_ID = 101;
+    private static final int RECIPES = 100;
+    private static final int RECIPE_WITH_RECIPE_ID = 101;
 
 
 

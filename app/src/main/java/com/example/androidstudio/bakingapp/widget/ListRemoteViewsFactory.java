@@ -1,6 +1,5 @@
 package com.example.androidstudio.bakingapp.widget;
 
-import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
@@ -13,8 +12,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.example.androidstudio.bakingapp.widget.IngredientsWidgetProvider.updateAppWidget;
 
 /**
  * ListRemoteViewsFactory acts as the adapter for the collection view widget,

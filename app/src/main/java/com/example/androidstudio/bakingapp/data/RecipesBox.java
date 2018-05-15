@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Class that handles JSON format recipes
  */
-public class RecipesBox {
+class RecipesBox {
 
     private JSONArray recipes;
 

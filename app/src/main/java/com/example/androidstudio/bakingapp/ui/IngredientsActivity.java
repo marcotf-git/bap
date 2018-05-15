@@ -8,7 +8,6 @@ import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
 import com.example.androidstudio.bakingapp.data.Ingredient;
-import com.example.androidstudio.bakingapp.data.RecipesContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,8 +22,8 @@ public class IngredientsActivity extends AppCompatActivity {
 
     private static final String TAG = IngredientsActivity.class.getSimpleName();
 
-    public static final String EXTRA_RECIPE_NAME = "com.example.androidstudio.bakingapp.extra.RECIPE_NAME";
-    public static final String EXTRA_INGREDIENTS_JSON = "com.example.androidstudio.bakingapp.extra.INGREDIENTS_JSON";
+    private static final String EXTRA_RECIPE_NAME = "com.example.androidstudio.bakingapp.extra.RECIPE_NAME";
+    private static final String EXTRA_INGREDIENTS_JSON = "com.example.androidstudio.bakingapp.extra.INGREDIENTS_JSON";
 
     private String mRecipeName;
     private String mIngredientsJSON;
@@ -61,7 +60,7 @@ public class IngredientsActivity extends AppCompatActivity {
     /**
      * This helper function will load the IngredientsFragment, to show the ingredients in a view list.
      */
-    public void updateIngredientsView (JSONArray ingredientsJSON) {
+    private void updateIngredientsView(JSONArray ingredientsJSON) {
 
         Log.v(TAG, "updateIngredientsView ingredientsJSON:" + ingredientsJSON.toString());
 

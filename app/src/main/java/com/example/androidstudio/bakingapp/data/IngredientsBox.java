@@ -13,7 +13,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IngredientsBox {
+class IngredientsBox {
 
     private static JSONArray ingredients;
 
@@ -43,7 +43,7 @@ public class IngredientsBox {
         return 0;
     }
 
-    public static List<String> getIngredientsListString() {
+    private static List<String> getIngredientsListString() {
 
         List<String> ingredients = new ArrayList<>();
 

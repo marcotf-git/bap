@@ -14,7 +14,7 @@ public final class  RecipesContract {
     public static final String AUTHORITY = "com.example.androidstudio.bakingapp";
 
     // The base content URI = "content://" + <authority>
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
+    private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
     // Define the possible paths for accessing data in this contract
     // This is the path for the "recipes" directory

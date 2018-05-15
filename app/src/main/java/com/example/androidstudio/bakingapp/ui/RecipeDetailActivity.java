@@ -36,17 +36,17 @@ public class RecipeDetailActivity extends AppCompatActivity
     private static final String TAG = RecipeDetailActivity.class.getSimpleName();
 
     // Final string to store state information
-    public static final String STEP_NUMBER = "step";
-    public static final String CLICKED_ITEM_INDEX = "clickedItemIndex";
-    public static final String RECIPE_NAME = "recipeName";
-    public static final String INGREDIENTS_JSON_STRING = "ingredientsJSONString";
-    public static final String STEPS_JSON_STRING = "stepsJSONString";
-    public static final String SERVINGS = "servings";
+    private static final String STEP_NUMBER = "step";
+    private static final String CLICKED_ITEM_INDEX = "clickedItemIndex";
+    private static final String RECIPE_NAME = "recipeName";
+    private static final String INGREDIENTS_JSON_STRING = "ingredientsJSONString";
+    private static final String STEPS_JSON_STRING = "stepsJSONString";
+    private static final String SERVINGS = "servings";
 
     // Final strings to store views visibility state
-    public static final String PLAYER_VIEW_VISIBILITY = "player_view_visibility";
-    public static final String THUMBNAIL_VIEW_VISIBILITY = "thumbnail_view_visibility";
-    public static final String ERROR_VIEW_VISIBILITY = "error_view_visibility";
+    private static final String PLAYER_VIEW_VISIBILITY = "player_view_visibility";
+    private static final String THUMBNAIL_VIEW_VISIBILITY = "thumbnail_view_visibility";
+    private static final String ERROR_VIEW_VISIBILITY = "error_view_visibility";
 
     private int clickedItemIndex;
     private String recipeName;
@@ -60,10 +60,14 @@ public class RecipeDetailActivity extends AppCompatActivity
     private boolean mTwoPane;
 
     // The views variables
-    @BindView(R.id.tv_recipe_name) TextView mDisplayName;
-    @Nullable @BindView(R.id.player_container) View mPlayerView;
-    @Nullable @BindView(R.id.iv_thumbnail) ImageView thumbnailView;
-    @Nullable @BindView(R.id.tv_illustration_not_available_label) TextView errorMessageView;
+    @BindView(R.id.tv_recipe_name)
+    TextView mDisplayName;
+    @Nullable @BindView(R.id.player_container)
+    View mPlayerView;
+    @Nullable @BindView(R.id.iv_thumbnail)
+    ImageView thumbnailView;
+    @Nullable @BindView(R.id.tv_illustration_not_available_label)
+    TextView errorMessageView;
 
 
     @Override

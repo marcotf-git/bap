@@ -16,7 +16,7 @@ public class StepDetailFragment extends Fragment {
     private static final String TAG = StepDetailFragment.class.getSimpleName();
 
     // Final Strings to store state information
-    public static final String STEP_DESCRIPTION = "description";
+    private static final String STEP_DESCRIPTION = "description";
 
     // Variables to store resources that this fragment displays
     private String description;
@@ -32,7 +32,7 @@ public class StepDetailFragment extends Fragment {
      * Inflates the fragment layout and sets any view resources
       */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         if(savedInstanceState != null) {
             description = savedInstanceState.getString(STEP_DESCRIPTION);

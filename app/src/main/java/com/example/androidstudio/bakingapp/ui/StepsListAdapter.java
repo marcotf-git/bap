@@ -1,18 +1,15 @@
 package com.example.androidstudio.bakingapp.ui;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
-import com.example.androidstudio.bakingapp.data.RecipesBox;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -92,8 +89,9 @@ public class StepsListAdapter extends RecyclerView.Adapter<StepsListAdapter.Step
      *                  for more details.
      * @return A new NumberViewHolder that holds the View for each list item
      */
+    @NonNull
     @Override
-    public StepsListAdapter.StepViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public StepsListAdapter.StepViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
 
         Context context = viewGroup.getContext();
 
@@ -122,7 +120,7 @@ public class StepsListAdapter extends RecyclerView.Adapter<StepsListAdapter.Step
      * @param position The position of the item within the adapter's data set.
      */
     @Override
-    public void onBindViewHolder(final StepsListAdapter.StepViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final StepsListAdapter.StepViewHolder holder, int position) {
 
         Log.d(TAG, "#" + position);
 
@@ -167,7 +165,7 @@ public class StepsListAdapter extends RecyclerView.Adapter<StepsListAdapter.Step
         @BindView(R.id.tv_step_id) TextView idView;
         @BindView(R.id.tv_step_short_description) TextView shortDescriptionTextView;
 
-        Context context;
+        final Context context;
 
         /**
          * Constructor for our ViewHolder. Within this constructor, we get a reference to our

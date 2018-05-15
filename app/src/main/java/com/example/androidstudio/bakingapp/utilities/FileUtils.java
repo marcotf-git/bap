@@ -9,7 +9,7 @@ import java.util.Scanner;
 /**
  * This is a utility class for loading the data from the JSON file.
  */
-public class FileUtils {
+class FileUtils {
 
 
     public static String getStringFromFile(Context context, String fileName) throws IOException {

@@ -2,6 +2,7 @@ package com.example.androidstudio.bakingapp.ui;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,16 +12,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
-import com.example.androidstudio.bakingapp.data.Recipe;
-import com.example.androidstudio.bakingapp.data.RecipesBox;
 import com.example.androidstudio.bakingapp.data.RecipesContract;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -85,8 +79,9 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      *                  for more details.
      * @return A new NumberViewHolder that holds the View for each list item
      */
+    @NonNull
     @Override
-    public RecipeViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public RecipeViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
 
         Context context = viewGroup.getContext();
 
@@ -115,7 +110,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      * @param position The position of the item within the adapter's data set.
      */
     @Override
-    public void onBindViewHolder(final RecipeViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final RecipeViewHolder holder, int position) {
 
         Log.d(TAG, "#" + position);
 
@@ -191,7 +186,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         @BindView(R.id.iv_main_recipe_image) ImageView recipeImageView;
         @BindView(R.id.tv_main_recipe_name) TextView recipeTextView;
         @BindView(R.id.tv_recipe_image_error_message_label) TextView errorTextView;
-        Context context;
+        final Context context;
 
         /**
          * Constructor for our ViewHolder. Within this constructor, we get a reference to our

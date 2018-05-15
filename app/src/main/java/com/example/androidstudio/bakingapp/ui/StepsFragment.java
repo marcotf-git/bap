@@ -2,6 +2,7 @@ package com.example.androidstudio.bakingapp.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +18,7 @@ public class StepsFragment extends Fragment
 
     private static final String TAG = StepsFragment.class.getSimpleName();
 
-    public static final String STEPS_JSON_STRING = "stepsJSONString";
+    private static final String STEPS_JSON_STRING = "stepsJSONString";
 
     // Variables to store resources that this fragment displays
     private String stepsJSONString;
@@ -25,7 +26,7 @@ public class StepsFragment extends Fragment
     private StepsListAdapter mAdapter;
 
     // Listener variable
-    OnItemClickListener mCallback;
+    private OnItemClickListener mCallback;
 
 
     // Listener for communication with the RecipeDetailActivity
@@ -58,7 +59,7 @@ public class StepsFragment extends Fragment
      * Inflates the fragment layout and sets any view resources
       */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         // Inflate the Ingredients fragment layout
         View rootView = inflater.inflate(R.layout.fragment_steps, container, false);
@@ -114,7 +115,7 @@ public class StepsFragment extends Fragment
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
 
         savedInstanceState.putString(STEPS_JSON_STRING, stepsJSONString);
 

@@ -2,7 +2,7 @@ package com.example.androidstudio.bakingapp.ui;
 
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,7 +18,7 @@ public class IngredientsFragment extends Fragment {
 
     private static final String TAG = IngredientsFragment.class.getSimpleName();
 
-    public static final String INGREDIENTS_JSON_STRING = "ingredientsJSONString";
+    private static final String INGREDIENTS_JSON_STRING = "ingredientsJSONString";
 
     // Variables to store resources that this fragment displays
     private String ingredientsJSONString;
@@ -40,7 +40,7 @@ public class IngredientsFragment extends Fragment {
      * Inflates the fragment layout and sets any view resources
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Log.v(TAG, "onCreateView savedInstanceState:" + savedInstanceState);
 
@@ -75,7 +75,7 @@ public class IngredientsFragment extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
 
         savedInstanceState.putString(INGREDIENTS_JSON_STRING, ingredientsJSONString);
 

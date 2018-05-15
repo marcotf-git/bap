@@ -10,8 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".ui.StepDetailActivity"
-        android:id="@+id/sv_fragment_step_detail">
+        tools:context=".ui.StepDetailActivity">
 
         <TextView
             android:id="@+id/tv_step_description"

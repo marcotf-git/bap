@@ -20,7 +20,6 @@
 
 
     <LinearLayout
-        android:id="@+id/ll_step_detail"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center_vertical"
@@ -72,7 +71,6 @@
         <!-- Step Detail -->
         <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/sv_activity_step_detail"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             tools:context=".ui.StepDetailActivity"
@@ -89,8 +87,7 @@
     </LinearLayout>
 
     <LinearLayout
-            android:id="@+id/ll_recipe_detail"
-            android:layout_width="match_parent"
+        android:layout_width="match_parent"
             android:orientation="horizontal"
             android:paddingBottom="16dp"
             android:paddingTop="16dp"

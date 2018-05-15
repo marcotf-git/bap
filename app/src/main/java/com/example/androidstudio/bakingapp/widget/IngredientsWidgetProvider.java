@@ -21,8 +21,8 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
 
     private static final String TAG = IngredientsWidgetProvider.class.getSimpleName();
 
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                String recipeName, int appWidgetId) {
+    private static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
+                                        String recipeName, int appWidgetId) {
 
         Log.d(TAG, "updateAppWidget ");
 
@@ -47,11 +47,6 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
         }
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
-    }
-
-    @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
     @Override

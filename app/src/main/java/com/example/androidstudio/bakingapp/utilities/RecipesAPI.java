@@ -9,7 +9,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 
-public interface RecipesAPI {
+interface RecipesAPI {
 
     String PATH_URL = "android-baking-app-json";
 

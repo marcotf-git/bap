@@ -54,14 +54,14 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 @RunWith(AndroidJUnit4.class)
 public class MainActivityScreenTest {
 
-    public static final int ITEM = 0;
-    public static final String RECIPE_NAME = "Nutella Pie";
+    private static final int ITEM = 0;
+    private static final String RECIPE_NAME = "Nutella Pie";
 
     private IdlingResource mIdlingResource;
 
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
+    public final ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
 
 
     // Registers any resource that needs to be synchronized with Espresso before the test is run.

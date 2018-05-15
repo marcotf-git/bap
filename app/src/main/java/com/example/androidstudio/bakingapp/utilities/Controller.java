@@ -1,11 +1,10 @@
 package com.example.androidstudio.bakingapp.utilities;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.example.androidstudio.bakingapp.data.Recipe;
-import com.example.androidstudio.bakingapp.data.RecipesBox;
-import com.example.androidstudio.bakingapp.ui.MainActivity;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -21,9 +20,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class Controller implements Callback<List<Recipe>> {
 
     private static final String TAG = Controller.class.getSimpleName();
-    static final String BASE_URL = "https://go.udacity.com/";
+    private static final String BASE_URL = "https://go.udacity.com/";
 
-    OnDataLoadedListener mCallback;
+    private OnDataLoadedListener mCallback;
 
     public interface OnDataLoadedListener {
         void onDataLoaded(List<Recipe> recipes);
@@ -54,7 +53,7 @@ public class Controller implements Callback<List<Recipe>> {
     }
 
     @Override
-    public void onResponse(Call<List<Recipe>> call, Response<List<Recipe>> response) {
+    public void onResponse(@NonNull Call<List<Recipe>> call, @NonNull Response<List<Recipe>> response) {
         if(response.isSuccessful()) {
 
             List<Recipe> recipesList = response.body();
@@ -67,7 +66,7 @@ public class Controller implements Callback<List<Recipe>> {
     }
 
     @Override
-    public void onFailure(Call<List<Recipe>> call, Throwable t) {
+    public void onFailure(@NonNull Call<List<Recipe>> call, @NonNull Throwable t) {
 
         t.printStackTrace();
 
