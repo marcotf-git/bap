@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/list_padding"
         android:paddingBottom="@dimen/list_padding"
-        android:text="@string/steps" />
+        android:text="@string/steps"
+        android:textSize="@dimen/text_size_labels"/>
 
     <!--ListView
         android:id="@+id/steps_list"

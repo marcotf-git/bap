@@ -152,8 +152,8 @@ public class RecipeDetailActivity extends AppCompatActivity
             loadDescriptionAndVideoOrThumbnail(mStep);
         }
 
-        //IngredientsBox ingredientsInMemory = new IngredientsBox(ingredientsJSONString);
 
+        // Update the widget
         ListRemoteViewsFactory.setWidgetProviderData(ingredientsJSONString);
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);

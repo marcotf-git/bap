@@ -1,5 +1,7 @@
 package com.example.androidstudio.bakingapp.ui;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -37,6 +39,8 @@ import com.example.androidstudio.bakingapp.utilities.Controller;
 import com.example.androidstudio.bakingapp.utilities.DatabaseUtil;
 import com.example.androidstudio.bakingapp.data.RecipesContract;
 import com.example.androidstudio.bakingapp.data.RecipesDbHelper;
+import com.example.androidstudio.bakingapp.widget.IngredientsWidgetProvider;
+import com.example.androidstudio.bakingapp.widget.ListRemoteViewsFactory;
 
 import java.util.List;
 
@@ -407,6 +411,5 @@ public class MainActivity extends AppCompatActivity implements
         finish();
         startActivity(getIntent());
     }
-
 
 }
