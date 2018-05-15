@@ -6,25 +6,29 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.androidstudio.bakingapp.IdlingResource.SimpleIdlingResource;
 import com.example.androidstudio.bakingapp.R;
@@ -33,23 +37,17 @@ import com.example.androidstudio.bakingapp.utilities.Controller;
 import com.example.androidstudio.bakingapp.utilities.DatabaseUtil;
 import com.example.androidstudio.bakingapp.data.RecipesContract;
 import com.example.androidstudio.bakingapp.data.RecipesDbHelper;
-import com.example.androidstudio.bakingapp.utilities.FileUtils;
-import com.example.androidstudio.bakingapp.data.RecipesBox;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class MainActivity extends AppCompatActivity
-        implements  RecipesListAdapter.ListItemClickListener,
-                    Controller.OnDataLoadedListener{
+public class MainActivity extends AppCompatActivity implements
+        RecipesListAdapter.ListItemClickListener,
+        LoaderManager.LoaderCallbacks<Cursor>,
+        Controller.OnDataLoadedListener{
 
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -67,12 +65,13 @@ public class MainActivity extends AppCompatActivity
 
     private RecipesListAdapter mAdapter;
 
-    private List<Recipe> mRecipes;
     private Cursor mData;
 
     // Fields for handling the saving and restoring of view state
     private static final String RECYCLER_VIEW_STATE = "recyclerViewState";
     private Parcelable recyclerViewState;
+
+    private static final int ID_RECIPES_LOADER = 44;
 
 
     // The Idling Resource which will be null in production.
@@ -133,7 +132,7 @@ public class MainActivity extends AppCompatActivity
             mIdlingResource.setIdleState(false);
         }
 
-
+        // Load data from http with the Retrofit library
         Controller controller = new Controller();
         controller.start(this);
 
@@ -156,6 +155,31 @@ public class MainActivity extends AppCompatActivity
         recyclerViewState = savedInstanceState.getParcelable(RECYCLER_VIEW_STATE);
         mRecipesList.getLayoutManager().onRestoreInstanceState(recyclerViewState);
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                Toast.makeText(this, "Reloading the data", Toast.LENGTH_LONG)
+                        .show();
+                refreshActivity();
+                break;
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
 
     /**
@@ -286,66 +310,103 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
+    // This method is called by the Controller when Retrofit finishes the loading
     @Override
     public void onDataLoaded(List<Recipe> recipes) {
 
-        if (mRecipes != null) {
-            mRecipes.clear();
-        } else {
-            mRecipes = new ArrayList<>();
+        // Try to handle error on loading
+        if(recipes == null){
+            showErrorMessage();
+            return;
         }
 
-
-        mRecipes.addAll(recipes);
-
-        for(Recipe recipe: mRecipes) {
+        for(Recipe recipe: recipes) {
             Log.v(TAG, "onDataLoaded recipe names:" + recipe.getName());
         }
 
+        // Store the data on the database
         deleteDatabase();
         insertRecipesInDatabase(recipes);
 
-        if(null != mData) {
-            mData.close();
-        }
+        // Query the database and set the adapter with the cursor data
+        getSupportLoaderManager().initLoader(ID_RECIPES_LOADER, null, this);
 
-        new RecipesFetchTask().execute();
+    }
+
+
+    /**
+     * Called by the {@link android.support.v4.app.LoaderManagerImpl} when a new Loader needs to be
+     * created. This Activity only uses one loader, so we don't necessarily NEED to check the
+     * loaderId, but this is certainly best practice.
+     *
+     * @param loaderId The loader ID for which we need to create a loader
+     * @param bundle   Any arguments supplied by the caller
+     * @return A new Loader instance that is ready to start loading.
+     */
+    @Override
+    public Loader<Cursor> onCreateLoader(int loaderId, Bundle bundle) {
+
+        Log.v(TAG, "onCreateLoader");
+
+        switch (loaderId) {
+
+            case ID_RECIPES_LOADER:
+                /* URI for all rows of recipes data in our recipes table */
+                Uri recipesQueryUri = RecipesContract.RecipeslistEntry.CONTENT_URI;
+
+                return new CursorLoader(this,
+                        recipesQueryUri,
+                        null,
+                        null,
+                        null,
+                        null);
+
+            default:
+                throw new RuntimeException("Loader Not Implemented: " + loaderId);
+        }
+    }
+
+    /**
+     * Called when a Loader has finished loading its data.
+     *
+     * @param loader The Loader that has finished.
+     * @param data   The data generated by the Loader.
+     */
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        mData = data;
+        // Set the data for the adapter
+        mAdapter.setRecipesCursorData(data);
+
+        if (mIdlingResource != null) {
+            mIdlingResource.setIdleState(false);
+        }
 
         showRecipesDataView();
+    }
 
+    /**
+     * Called when a previously created loader is being reset, and thus making its data unavailable.
+     * The application should at this point remove any references it has to the Loader's data.
+     *
+     * @param loader The Loader that is being reset.
+     */
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        /*
+         * Since this Loader's data is now invalid, we need to clear the Adapter that is
+         * displaying the data.
+         */
+        mAdapter.setRecipesCursorData(null);
     }
 
 
-    // Use an async task to do the data fetch off of the main thread.
-    public class RecipesFetchTask extends AsyncTask<Void, Void, Cursor> {
-
-        // Invoked on a background thread
-        @Override
-        protected Cursor doInBackground(Void... params) {
-
-            // Make the query to get the data
-            // Get the content resolver
-            ContentResolver resolver = getContentResolver();
-            // Call the query method on the resolver with the correct Uri from the contract class
-            Cursor cursor = resolver.query(RecipesContract.RecipeslistEntry.CONTENT_URI,
-                    null, null, null, null);
-            return cursor;
-        }
-
-        // Invoked on UI thread
-        @Override
-        protected void onPostExecute(Cursor cursor) {
-            super.onPostExecute(cursor);
-            // Set the data for MainActivity
-            mData = cursor;
-            // Set the data for the adapter
-            mAdapter.setRecipesCursorData(cursor);
-
-            if (mIdlingResource != null) {
-                mIdlingResource.setIdleState(false);
-            }
-        }
+    // Reload the activity
+    public void refreshActivity() {
+        finish();
+        startActivity(getIntent());
     }
+
 
 }

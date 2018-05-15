@@ -46,6 +46,7 @@ public class StepsListAdapter extends RecyclerView.Adapter<StepsListAdapter.Step
      */
     public interface ListItemClickListener {
         void onListItemClick(
+                int clickedPosition,
                 int stepId,
                 String shortDescription,
                 String description,
@@ -216,6 +217,7 @@ public class StepsListAdapter extends RecyclerView.Adapter<StepsListAdapter.Step
 
                 // Calls the method implemented in the main activity
                 mOnClickListener.onListItemClick(
+                        clickedPosition,
                         stepId,
                         shortDescription,
                         description,

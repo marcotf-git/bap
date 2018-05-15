@@ -68,6 +68,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
 
 
     void setRecipesCursorData(Cursor cursor){
+        Log.v(TAG, "setRecipesCursorData cursor:" + cursor.toString());
         this.recipesCursor = cursor;
         notifyDataSetChanged();
     }

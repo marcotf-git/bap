@@ -49,7 +49,6 @@ public class RecipeDetailActivity extends AppCompatActivity
     public static final String THUMBNAIL_VIEW_VISIBILITY = "thumbnail_view_visibility";
     public static final String ERROR_VIEW_VISIBILITY = "error_view_visibility";
 
-
     private int clickedItemIndex;
     private String recipeName;
     private String ingredientsJSONString;
@@ -150,9 +149,9 @@ public class RecipeDetailActivity extends AppCompatActivity
 
         // If two-pane screen, show also the StepDetailFragment with the initial step
         // and the video of the step
-//        if (mTwoPane && savedInstanceState == null) {
-//            loadDescriptionAndVideoOrThumbnail(mStep);
-//        }
+        if (mTwoPane && savedInstanceState == null) {
+            loadDescriptionAndVideoOrThumbnail(mStep);
+        }
 
     }
 
@@ -161,95 +160,113 @@ public class RecipeDetailActivity extends AppCompatActivity
      * Helper method for loading the step description, and also its video or thumbnail
      *
      */
-//    private void loadDescriptionAndVideoOrThumbnail (int stepNumber) {
-////
-////        // Set initial state of the player and thumbnail views (this method is only called in two pane)
-////        errorMessageView.setVisibility(View.GONE);
-////        mPlayerView.setVisibility(View.GONE);
-////        thumbnailView.setVisibility(View.GONE);
-////
-////        // Remove previously loaded fragments
-////        FragmentManager myFragmentManager = getSupportFragmentManager();
-////        Fragment fragment = myFragmentManager.findFragmentById(R.id.step_detail_container);
-////        if (null != fragment) {
-////            myFragmentManager.beginTransaction().remove(fragment).commit();
-////        }
-////        fragment = myFragmentManager.findFragmentById(R.id.player_container);
-////        if (null != fragment) {
-////            myFragmentManager.beginTransaction().remove(fragment).commit();
-////        }
-////
-////        // Create a new StepDetailFragment instance and display it using the FragmentManager
-////        StepDetailFragment stepDetailFragment = new StepDetailFragment();
-////        // Set the fragment data
-////        stepDetailFragment.setDescription(steps.get(stepNumber).getDescription());
-////        // Use a FragmentManager and transaction to add the fragment to the screen
-////        FragmentManager stepFragmentManager = getSupportFragmentManager();
-////        stepFragmentManager.beginTransaction()
-////                .add(R.id.step_detail_container, stepDetailFragment)
-////                .commit();
-////
-////        // Then, try to load a new one
-////        String mStepVideoURL = steps.get(stepNumber).getVideoURL();
-////
-////        if (mStepVideoURL != null && (!mStepVideoURL.equals(""))) {
-////
-////            ExoPlayerFragment exoPlayerFragment = new ExoPlayerFragment();
-////            // Set the fragment data
-////            exoPlayerFragment.setMediaUrl(mStepVideoURL);
-////            // Use a FragmentManager and transaction to add the fragment to the screen
-////            FragmentManager playerFragmentManager = getSupportFragmentManager();
-////            // Use a FragmentManager and transaction to add the fragment to the screen
-////            playerFragmentManager.beginTransaction()
-////                    .add(R.id.player_container, exoPlayerFragment)
-////                    .commit();
-////            mPlayerView.setVisibility(View.VISIBLE);
-////
-////        } else {
-////
-////            // In case of no video, try to show the thumbnail
-////            String mStepThumbnailURL = steps.get(stepNumber).getThumbnailURL();
-////
-////            if (mStepThumbnailURL != null && (!mStepThumbnailURL.equals(""))) {
-////                /*
-////                 * Use the call back of picasso to manage the error in loading thumbnail.
-////                 */
-////                Picasso.with(this)
-////                        .load(mStepThumbnailURL)
-////                        .into(thumbnailView, new Callback() {
-////                            @Override
-////                            public void onSuccess() {
-////                                Log.v(TAG, "Thumbnail loaded");
-////                                thumbnailView.setVisibility(View.VISIBLE);
-////                            }
-////
-////                            @Override
-////                            public void onError() {
-////                                Log.e(TAG, "Error in loading thumbnail");
-////                                if (mPlayerView.getVisibility() == GONE) {
-////                                    errorMessageView.setVisibility(View.VISIBLE);
-////                                }
-////                            }
-////                        });
-////            }  else {
-////                errorMessageView.setVisibility(View.VISIBLE);
-////            }
-////        }
-////    }
+    private void loadDescriptionAndVideoOrThumbnail (int stepNumber) {
+
+        // Set initial state of the player and thumbnail views (this method is only called in two pane)
+        errorMessageView.setVisibility(View.GONE);
+        mPlayerView.setVisibility(View.GONE);
+        thumbnailView.setVisibility(View.GONE);
+
+        // Remove previously loaded fragments
+        FragmentManager myFragmentManager = getSupportFragmentManager();
+        Fragment fragment = myFragmentManager.findFragmentById(R.id.step_detail_container);
+        if (null != fragment) {
+            myFragmentManager.beginTransaction().remove(fragment).commit();
+        }
+        fragment = myFragmentManager.findFragmentById(R.id.player_container);
+        if (null != fragment) {
+            myFragmentManager.beginTransaction().remove(fragment).commit();
+        }
+
+
+        // Initialize the variables that will be used
+        String description = null;
+        String videoURL = null;
+        String thumbnailURL = null;
+
+        try {
+            JSONArray stepsJSON = new JSONArray(stepsJSONString);
+            JSONObject jsonObject = stepsJSON.getJSONObject(mStep);
+            description = jsonObject.getString("description");
+            videoURL = jsonObject.getString("videoURL");
+            thumbnailURL = jsonObject.getString("thumbnailURL");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if(description != null) {
+            // Create a new StepDetailFragment instance and display it using the FragmentManager
+            StepDetailFragment stepDetailFragment = new StepDetailFragment();
+            // Set the fragment data
+            stepDetailFragment.setDescription(description);
+            // Use a FragmentManager and transaction to add the fragment to the screen
+            FragmentManager stepFragmentManager = getSupportFragmentManager();
+            stepFragmentManager.beginTransaction()
+                    .add(R.id.step_detail_container, stepDetailFragment)
+                    .commit();
+        }
+
+
+        // Then, try to load the video or the thumbnail
+        if (videoURL != null && (!videoURL.equals(""))) {
+
+            ExoPlayerFragment exoPlayerFragment = new ExoPlayerFragment();
+            // Set the fragment data
+            exoPlayerFragment.setMediaUrl(videoURL);
+            // Use a FragmentManager and transaction to add the fragment to the screen
+            FragmentManager playerFragmentManager = getSupportFragmentManager();
+            // Use a FragmentManager and transaction to add the fragment to the screen
+            playerFragmentManager.beginTransaction()
+                    .add(R.id.player_container, exoPlayerFragment)
+                    .commit();
+            mPlayerView.setVisibility(View.VISIBLE);
+
+        } else {
+
+            if (thumbnailURL != null && (!thumbnailURL.equals(""))) {
+                /*
+                 * Use the call back of picasso to manage the error in loading thumbnail.
+                 */
+                Picasso.with(this)
+                        .load(thumbnailURL)
+                        .into(thumbnailView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Log.v(TAG, "Thumbnail loaded");
+                                thumbnailView.setVisibility(View.VISIBLE);
+                            }
+
+                            @Override
+                            public void onError() {
+                                Log.e(TAG, "Error in loading thumbnail");
+                                if (mPlayerView.getVisibility() == GONE) {
+                                    errorMessageView.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        });
+            }  else {
+                errorMessageView.setVisibility(View.VISIBLE);
+            }
+        }
+    }
 
 
     /**
      * This is the listener that receives communication from the StepsFragment
      */
     @Override
-    public void onStepSelected(int stepId,
+    public void onStepSelected(int clickedPosition,
+                               int stepId,
                                String shortDescription,
                                String description,
                                String videoURL,
                                String thumbnailURL,
                                String stepsJSONString) {
 
+        Log.v(TAG, "onStepSelected clickedPosition:" + clickedPosition);
         Log.v(TAG, "onStepSelected stepId:" + stepId);
+
+        mStep = clickedPosition;
 
         Context context = RecipeDetailActivity.this;
 
@@ -257,6 +274,7 @@ public class RecipeDetailActivity extends AppCompatActivity
             // If one-pane screen, call the StepDetailActivity to show the step detail
             Class destinationActivity = StepDetailActivity.class;
             Intent startChildActivityIntent = new Intent(context, destinationActivity);
+            startChildActivityIntent.putExtra("clickedPosition", clickedPosition);
             startChildActivityIntent.putExtra("id", stepId);
             startChildActivityIntent.putExtra("description", description);
             startChildActivityIntent.putExtra("videoURL", videoURL);
@@ -266,7 +284,7 @@ public class RecipeDetailActivity extends AppCompatActivity
         } else {
             // If two-pane screen, show also the StepDetailFragment with the initial step
             // and the video of the step
-            //loadDescriptionAndVideoOrThumbnail(mStep);
+            loadDescriptionAndVideoOrThumbnail(mStep);
         }
     }
 
@@ -291,9 +309,5 @@ public class RecipeDetailActivity extends AppCompatActivity
         super.onSaveInstanceState(savedInstanceState);
     }
 
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-    }
 
 }

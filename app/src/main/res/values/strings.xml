@@ -4,6 +4,7 @@
 
     <string name="file_loading_error_message">
         Failed to load the file with the recipes.
+        Please, verify the internet connection and try again.
     </string>
 
     <string name="recipe_name">Recipe Name</string>
@@ -20,5 +21,9 @@
     <string name="prev">Prev</string>
     <string name="next">Next</string>
     <string name="widget_image">Widget Image</string>
+    <string name="button_refresh">Refresh</string>
+    <string name="recipe_detail_activity_label">Recipe Details</string>
+    <string name="step_details_activity_label">Step Details</string>
+    <string name="menu_action_refresh_label">Refresh</string>
 
 </resources>

@@ -30,7 +30,8 @@ public class StepsFragment extends Fragment
 
     // Listener for communication with the RecipeDetailActivity
     public interface OnItemClickListener {
-        void onStepSelected(int stepId,
+        void onStepSelected(int clickedPosition,
+                            int stepId,
                             String shortDescription,
                             String description,
                             String videoURL,
@@ -93,14 +94,17 @@ public class StepsFragment extends Fragment
 
 
     @Override
-    public void onListItemClick(int stepId,
+    public void onListItemClick(int clickedPosition,
+                                int stepId,
                                 String shortDescription,
                                 String description,
                                 String videoURL,
                                 String thumbnailURL,
                                 String stepsJSONString) {
 
-        mCallback.onStepSelected(stepId,
+        mCallback.onStepSelected(
+                clickedPosition,
+                stepId,
                 shortDescription,
                 description,
                 videoURL,

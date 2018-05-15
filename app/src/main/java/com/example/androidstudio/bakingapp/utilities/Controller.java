@@ -29,8 +29,6 @@ public class Controller implements Callback<List<Recipe>> {
         void onDataLoaded(List<Recipe> recipes);
     }
 
-
-
     public void start(Context context) {
 
         try{
@@ -61,10 +59,6 @@ public class Controller implements Callback<List<Recipe>> {
 
             List<Recipe> recipesList = response.body();
 
-//            for(Recipe recipe: recipesList) {
-//                Log.v(TAG, "onResponse recipe names:" + recipe.getName());
-//            }
-
             mCallback.onDataLoaded(recipesList);
 
         } else {
@@ -74,7 +68,10 @@ public class Controller implements Callback<List<Recipe>> {
 
     @Override
     public void onFailure(Call<List<Recipe>> call, Throwable t) {
+
         t.printStackTrace();
+
+        mCallback.onDataLoaded(null);
     }
 
 }
