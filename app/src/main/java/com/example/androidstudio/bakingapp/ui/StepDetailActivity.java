@@ -30,16 +30,16 @@ public class StepDetailActivity extends AppCompatActivity {
     private static final String TAG = StepDetailActivity.class.getSimpleName();
 
     // Final strings to store views visibility state
-    public static final String PLAYER_VIEW_VISIBILIBITY = "player_view_visibility";
-    public static final String THUMBNAIL_VIEW_VISIBILIBITY = "thumbnail_view_visibility";
-    public static final String ERROR_VIEW_VISIBILIBITY = "error_view_visibility";
+    public static final String PLAYER_VIEW_VISIBILITY = "player_view_visibility";
+    public static final String THUMBNAIL_VIEW_VISIBILITY = "thumbnail_view_visibility";
+    public static final String ERROR_VIEW_VISIBILITY = "error_view_visibility";
 
     // The data vars of the recipe being viewed
-    private String stepsJSONtoString;
+    private String stepsJSONString;
     private JSONArray stepsJSON;
+
     private int mStep;
-    private JSONObject jsonObject;
-    private String stepDescription;
+    private String description;
     private String videoURL;
     private String thumbnailURL;
 
@@ -58,37 +58,26 @@ public class StepDetailActivity extends AppCompatActivity {
 
         // Recover the views state in case of device rotating
         if (savedInstanceState != null) {
-            mPlayerView.setVisibility(savedInstanceState.getInt(PLAYER_VIEW_VISIBILIBITY));
-            thumbnailView.setVisibility(savedInstanceState.getInt(THUMBNAIL_VIEW_VISIBILIBITY));
-            errorMessageView.setVisibility(savedInstanceState.getInt(ERROR_VIEW_VISIBILIBITY));
+            mPlayerView.setVisibility(savedInstanceState.getInt(PLAYER_VIEW_VISIBILITY));
+            thumbnailView.setVisibility(savedInstanceState.getInt(THUMBNAIL_VIEW_VISIBILITY));
+            errorMessageView.setVisibility(savedInstanceState.getInt(ERROR_VIEW_VISIBILITY));
         }
 
         /* Initialize the data vars for this class */
 
         Intent intentThatStartedThisActivity = getIntent();
-        if (null != savedInstanceState) {
-            mStep = savedInstanceState.getInt("mStep");
-        } else {
-            if (intentThatStartedThisActivity.hasExtra("mStep")) {
-                mStep = intentThatStartedThisActivity.getIntExtra("mStep", 0);
-            }
-        }
 
-        if (intentThatStartedThisActivity.hasExtra("stepsJSONtoString")) {
-            stepsJSONtoString = intentThatStartedThisActivity.getStringExtra("stepsJSONtoString");
-        }
+        mStep = intentThatStartedThisActivity.getIntExtra("id", 0);
+        description = intentThatStartedThisActivity.getStringExtra("description");
+        videoURL = intentThatStartedThisActivity.getStringExtra("videoURL");
+        thumbnailURL = intentThatStartedThisActivity.getStringExtra("thumbnailURL");
+        stepsJSONString = intentThatStartedThisActivity.getStringExtra("stepsJSONString");
 
-        Log.v(TAG, "onCreate mStep:" + mStep);
-
-        // Extract all the steps
         try {
-            stepsJSON = new JSONArray(stepsJSONtoString);
+            stepsJSON = new JSONArray(stepsJSONString);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        // Extract the variables for the current step mStep
-        loadStepVars();
 
         /* Render the views with the data vars */
 
@@ -125,8 +114,8 @@ public class StepDetailActivity extends AppCompatActivity {
         StepDetailFragment stepDetailFragment = new StepDetailFragment();
 
         // Set the fragment data
-        if (stepDescription != null) {
-            stepDetailFragment.setDescription(stepDescription);
+        if (description != null) {
+            stepDetailFragment.setDescription(description);
         } else {
             stepDetailFragment.setDescription("No step description available.");
         }
@@ -187,11 +176,10 @@ public class StepDetailActivity extends AppCompatActivity {
 
     // Extract the vars for the step being viewed
     private void loadStepVars() {
-
         // Extract the vars for the mStep
         try {
-            jsonObject = stepsJSON.getJSONObject(mStep);
-            stepDescription = jsonObject.getString("description");
+            JSONObject jsonObject = stepsJSON.getJSONObject(mStep);
+            description = jsonObject.getString("description");
             videoURL = jsonObject.getString("videoURL");
             thumbnailURL = jsonObject.getString("thumbnailURL");
         } catch (JSONException e) {
@@ -202,12 +190,8 @@ public class StepDetailActivity extends AppCompatActivity {
 
     // Called by button Prev
     public void loadPrevStep(View view) {
-
         mStep--;
-        if (mStep < 0) {
-            mStep = 0;
-        }
-
+        if (mStep < 0) { mStep = 0; }
         loadStepVars();
         loadViews();
     }
@@ -215,12 +199,10 @@ public class StepDetailActivity extends AppCompatActivity {
 
     // Called by button Next
     public void loadNextStep(View view) {
-
         mStep++;
         if (mStep >= stepsJSON.length()) {
             mStep = stepsJSON.length() - 1;
         }
-
         loadStepVars();
         loadViews();
     }
@@ -230,10 +212,9 @@ public class StepDetailActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
 
-        outState.putInt(PLAYER_VIEW_VISIBILIBITY, mPlayerView.getVisibility());
-        outState.putInt(THUMBNAIL_VIEW_VISIBILIBITY, thumbnailView.getVisibility());
-        outState.putInt(ERROR_VIEW_VISIBILIBITY, errorMessageView.getVisibility());
-
+        outState.putInt(PLAYER_VIEW_VISIBILITY, mPlayerView.getVisibility());
+        outState.putInt(THUMBNAIL_VIEW_VISIBILITY, thumbnailView.getVisibility());
+        outState.putInt(ERROR_VIEW_VISIBILITY, errorMessageView.getVisibility());
         outState.putInt("mStep", mStep);
 
         super.onSaveInstanceState(outState);

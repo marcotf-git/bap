@@ -3,33 +3,39 @@ package com.example.androidstudio.bakingapp.ui;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.example.androidstudio.bakingapp.R;
-import com.example.androidstudio.bakingapp.data.Step;
-
-import java.util.ArrayList;
 
 
-public class StepsFragment extends Fragment {
+public class StepsFragment extends Fragment
+        implements StepsListAdapter.ListItemClickListener{
 
     private static final String TAG = StepsFragment.class.getSimpleName();
 
+    public static final String STEPS_JSON_STRING = "stepsJSONString";
+
     // Variables to store resources that this fragment displays
-    // The array for storing information about the steps
-    private final ArrayList<Step> mSteps = new ArrayList<>();
+    private String stepsJSONString;
+
+    private StepsListAdapter mAdapter;
 
     // Listener variable
     OnItemClickListener mCallback;
 
+
     // Listener for communication with the RecipeDetailActivity
     public interface OnItemClickListener {
-        void onStepSelected(int position);
+        void onStepSelected(int stepId,
+                            String shortDescription,
+                            String description,
+                            String videoURL,
+                            String thumbnailURL,
+                            String stepsJSONString);
     }
 
     @Override
@@ -53,38 +59,26 @@ public class StepsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        // Inflate the Steps fragment layout
+        // Inflate the Ingredients fragment layout
         View rootView = inflater.inflate(R.layout.fragment_steps, container, false);
 
-        // Get a reference to the steps list
-        ListView listView = rootView.findViewById(R.id.steps_list);
+        // Get a reference to the ingredients list
+        RecyclerView mStepsList = rootView.findViewById(R.id.steps_list);
+
+        // Set the layout manager
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        mStepsList.setLayoutManager(layoutManager);
+        mStepsList.setHasFixedSize(true);
 
         // Set the data to display
-        StepAdapter stepAdapter = new StepAdapter(getContext(), mSteps);
-        listView.setAdapter(stepAdapter);
+        mAdapter = new StepsListAdapter(this);
+        mStepsList.setAdapter(mAdapter);
 
-        // Adjust the size of the list view to show all the steps
-        float listItemHeight = getResources().getDimension(R.dimen.step_list_item_height);
-        float listItemPadding = getResources().getDimension(R.dimen.list_padding);
-        Log.v(TAG, " list item height:" + listItemHeight);
-        Log.v(TAG, " mSteps:" + mSteps.size());
-        Log.v(TAG, " listItemPadding:" + listItemPadding);
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        int totalHeight = Math.round((listItemHeight * mSteps.size()) + listItemPadding);
-        params.height = totalHeight;
-        Log.v(TAG, " total list item height:" + totalHeight);
-        listView.setLayoutParams(params);
+        if (savedInstanceState != null) {
+            stepsJSONString = savedInstanceState.getString(STEPS_JSON_STRING);
+        }
 
-
-        // Set a click listener on the list view
-        // Set listener to show step description
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mCallback.onStepSelected(position);
-            }
-        });
+        mAdapter.setStepsData(stepsJSONString);
 
         // Return root view
         return rootView;
@@ -92,9 +86,36 @@ public class StepsFragment extends Fragment {
     }
 
 
-    public void setSteps(ArrayList<Step> steps) {
+    public void setSteps(String stepsJSONString) {
 
-        mSteps.addAll(steps);
+        this.stepsJSONString = stepsJSONString;
     }
+
+
+    @Override
+    public void onListItemClick(int stepId,
+                                String shortDescription,
+                                String description,
+                                String videoURL,
+                                String thumbnailURL,
+                                String stepsJSONString) {
+
+        mCallback.onStepSelected(stepId,
+                shortDescription,
+                description,
+                videoURL,
+                thumbnailURL,
+                stepsJSONString);
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+
+        savedInstanceState.putString(STEPS_JSON_STRING, stepsJSONString);
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
 
 }

@@ -4,9 +4,12 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -25,6 +28,7 @@ import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.IdlingResource.SimpleIdlingResource;
 import com.example.androidstudio.bakingapp.R;
+import com.example.androidstudio.bakingapp.data.Recipe;
 import com.example.androidstudio.bakingapp.utilities.Controller;
 import com.example.androidstudio.bakingapp.utilities.DatabaseUtil;
 import com.example.androidstudio.bakingapp.data.RecipesContract;
@@ -36,6 +40,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,7 +49,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity
         implements  RecipesListAdapter.ListItemClickListener,
-                    LoaderManager.LoaderCallbacks<String>{
+                    Controller.OnDataLoadedListener{
 
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -54,14 +60,19 @@ public class MainActivity extends AppCompatActivity
      */
     private static final int DELAY_MILLIS = 500;
 
-    /* This number will uniquely identify our Loader and is chosen arbitrarily. */
-    private static final int RECIPES_LOADER_FROM_HTTP_ID = 10;
 
     @BindView(R.id.tv_error_message_display) TextView mErrorMessageDisplay;
     @BindView(R.id.pb_loading_indicator) ProgressBar mLoadingIndicator;
     @BindView(R.id.rv_recipes) RecyclerView mRecipesList;
 
     private RecipesListAdapter mAdapter;
+
+    private List<Recipe> mRecipes;
+    private Cursor mData;
+
+    // Fields for handling the saving and restoring of view state
+    private static final String RECYCLER_VIEW_STATE = "recyclerViewState";
+    private Parcelable recyclerViewState;
 
 
     // The Idling Resource which will be null in production.
@@ -89,11 +100,6 @@ public class MainActivity extends AppCompatActivity
 
         ButterKnife.bind(this);
 
-//        Controller controller = new Controller();
-//        controller.start();
-//
-//        finish();
-
         // Set the layout manager
         int nColumns = numberOfColumns();
         GridLayoutManager layoutManager = new GridLayoutManager(this, nColumns);
@@ -111,10 +117,6 @@ public class MainActivity extends AppCompatActivity
         mAdapter = new RecipesListAdapter(this);
         mRecipesList.setAdapter(mAdapter);
 
-        // Loads the recipes in the adapter
-        int loaderId = RECIPES_LOADER_FROM_HTTP_ID;
-        LoaderManager.LoaderCallbacks<String> callback = MainActivity.this;
-        Bundle bundleForLoader = null;
 
         // Get the IdlingResource instance
         getIdlingResource();
@@ -131,129 +133,28 @@ public class MainActivity extends AppCompatActivity
             mIdlingResource.setIdleState(false);
         }
 
-        getSupportLoaderManager().initLoader(loaderId, bundleForLoader, callback);
+
+        Controller controller = new Controller();
+        controller.start(this);
 
     }
 
 
-    /**
-     * Instantiate and return a new Loader for the given ID.
-     *
-     * @param id The ID whose loader is to be created.
-     * @param loaderArgs Any arguments supplied by the caller.
-     *
-     * @return Return a new Loader instance that is ready to start loading.
-     */
+    // This method is saving the position of the recycler view
     @Override
-    public Loader<String> onCreateLoader(int id, final Bundle loaderArgs) {
-
-        Log.v(TAG, "onCreateLoader loader id:" + id);
-
-        final Context context = MainActivity.this;
-
-        return new AsyncTaskLoader<String>(this) {
-
-            /* This String will contain the raw JSON from the results of our search */
-            private String mStringJson = null;
-
-            /**
-             * Subclasses of AsyncTaskLoader must implement this to take care of loading their data.
-             */
-            @Override
-            protected void onStartLoading() {
-
-                if(mStringJson != null){
-                    deliverResult(mStringJson);
-                } else {
-                    mLoadingIndicator.setVisibility(View.VISIBLE);
-                    forceLoad();
-                }
-            }
-
-            /**
-             * This is the method of the AsyncTaskLoader that will load the JSON data
-             * from themoviedb.org in the background.
-             *
-             * @return Movies data from themoviedb.org as an String.
-             *         null if an error occurs
-             */
-            @Override
-            public String loadInBackground() {
-
-                String fileName = "baking.json";
-
-                try {
-                    String recipesJSONString = FileUtils.getStringFromFile(context, fileName);
-                    return recipesJSONString;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            /**
-             * Sends the result of the load to the registered listener.
-             *
-             * @param data The result of the load
-             */
-            @Override
-            public void deliverResult(String data) {
-                mStringJson = data;
-                super.deliverResult(data);
-            }
-        };
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        Parcelable recyclerViewState = mRecipesList.getLayoutManager().onSaveInstanceState();
+        savedInstanceState.putParcelable(RECYCLER_VIEW_STATE, recyclerViewState);
+        super.onSaveInstanceState(savedInstanceState);
     }
 
-    // When the load is finished, show either the data or an error message if there is no data.
+    // This method is loading the saved position of the recycler view
+    // There is also a call on the post execute method in the loader, for updating the view
     @Override
-    public void onLoadFinished(Loader<String> loader, String recipesStringJSON) {
-
-        Log.v(TAG, "onLoadFinished loader id:" + loader.getId());
-        Log.v(TAG, "onLoadFinished recipesJSONString:" + recipesStringJSON);
-        Log.v(TAG, "onLoadFinished recipesJSONString size:" + recipesStringJSON.length());
-
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
-
-        if (recipesStringJSON != null && !recipesStringJSON.equals("")) {
-
-            showRecipesDataView();
-            final RecipesBox recipesBox = new RecipesBox(recipesStringJSON);
-
-            // Save the data in a new local database, for being used by the app widget.
-            // The widget needs a persistent data storage.
-            deleteDatabase();
-            insertDataInDatabase(recipesBox);
-
-            //mAdapter.setRecipesData(recipesBox);
-
-            // This is for simulating a delay in the loader (it will set the view with delay)
-            // for Espresso illustration of the idling resources use.
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mAdapter.setRecipesData(recipesBox);
-                    // Set the idling resource for Espresso (now the app is in idle state)
-                    if (mIdlingResource != null) {
-                        mIdlingResource.setIdleState(true);
-                    }
-                }
-            }, DELAY_MILLIS);
-
-        } else {
-            showErrorMessage();
-            // Set the idling resource for Espresso
-            if (mIdlingResource != null) {
-                mIdlingResource.setIdleState(true);
-            }
-        }
-
-    }
-
-
-    @Override
-    public void onLoaderReset(Loader<String> loader) {
-
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        recyclerViewState = savedInstanceState.getParcelable(RECYCLER_VIEW_STATE);
+        mRecipesList.getLayoutManager().onRestoreInstanceState(recyclerViewState);
     }
 
 
@@ -295,7 +196,11 @@ public class MainActivity extends AppCompatActivity
      * @param clickedItemIndex Index in the list of the item that was clicked.
      */
     @Override
-    public void onListItemClick(int clickedItemIndex, String recipeStringJSON) {
+    public void onListItemClick(int clickedItemIndex,
+                                String recipeName,
+                                String ingredientsJSONString,
+                                String stepsJSONString,
+                                int servings) {
 
         Log.v(TAG, "onListItemClick clickedItemIndex:" + clickedItemIndex);
 
@@ -303,7 +208,13 @@ public class MainActivity extends AppCompatActivity
         Context context = MainActivity.this;
         Class destinationActivity = RecipeDetailActivity.class;
         Intent startChildActivityIntent = new Intent(context, destinationActivity);
-        startChildActivityIntent.putExtra("recipeStringJSON", recipeStringJSON);
+
+        startChildActivityIntent.putExtra("clickedItemIndex", clickedItemIndex);
+        startChildActivityIntent.putExtra("recipeName", recipeName);
+        startChildActivityIntent.putExtra("ingredientsJSONString", ingredientsJSONString);
+        startChildActivityIntent.putExtra("stepsJSONString", stepsJSONString);
+        startChildActivityIntent.putExtra("servings", servings);
+
         startActivity(startChildActivityIntent);
 
     }
@@ -334,7 +245,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    private void insertDataInDatabase(RecipesBox recipesBox) {
+    private void insertRecipesInDatabase(List<Recipe> recipes) {
 
         // Get the content resolver
         ContentResolver resolver = getContentResolver();
@@ -342,27 +253,20 @@ public class MainActivity extends AppCompatActivity
         // This is necessary to pass the values
         ContentValues cv = new ContentValues();
 
-        int numberOfRecipes = recipesBox.getNumberOfRecipes();
+        int numberOfRecipes = recipes.size();
 
         for (int i=0; i < numberOfRecipes; i++) {
 
-            JSONObject recipeJSON = recipesBox.getRecipeJSON(i);
+            Recipe recipe = recipes.get(i);
 
-            final int recipeId;
-            final String name;
-            final String ingredientsJSON;
-            final String stepsJSON;
-            final int servings;
-            final String imageURL;
+            int recipeId = recipe.getId();
+            String name = recipe.getName();
+            String ingredientsJSON = recipe.getIngredientsJSONString();
+            String stepsJSON = recipe.getStepsJSONString();
+            int servings = recipe.getServings();
+            String imageURL = recipe.getImage();
 
             try {
-
-                recipeId = recipeJSON.getInt("id");
-                name = recipeJSON.getString("name");
-                ingredientsJSON = recipeJSON.getString("ingredients");
-                stepsJSON = recipeJSON.getString("steps");
-                servings = recipeJSON.getInt("servings");
-                imageURL = recipeJSON.getString("image");
 
                 cv.put(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_ID, recipeId);
                 cv.put(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_NAME, name);
@@ -374,12 +278,74 @@ public class MainActivity extends AppCompatActivity
                 // Call the insert method on the resolver with the correct Uri from the contract class
                 resolver.insert(RecipesContract.RecipeslistEntry.CONTENT_URI, cv);
 
-            } catch (JSONException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
         }
 
+    }
+
+
+    @Override
+    public void onDataLoaded(List<Recipe> recipes) {
+
+        if (mRecipes != null) {
+            mRecipes.clear();
+        } else {
+            mRecipes = new ArrayList<>();
+        }
+
+
+        mRecipes.addAll(recipes);
+
+        for(Recipe recipe: mRecipes) {
+            Log.v(TAG, "onDataLoaded recipe names:" + recipe.getName());
+        }
+
+        deleteDatabase();
+        insertRecipesInDatabase(recipes);
+
+        if(null != mData) {
+            mData.close();
+        }
+
+        new RecipesFetchTask().execute();
+
+        showRecipesDataView();
+
+    }
+
+
+    // Use an async task to do the data fetch off of the main thread.
+    public class RecipesFetchTask extends AsyncTask<Void, Void, Cursor> {
+
+        // Invoked on a background thread
+        @Override
+        protected Cursor doInBackground(Void... params) {
+
+            // Make the query to get the data
+            // Get the content resolver
+            ContentResolver resolver = getContentResolver();
+            // Call the query method on the resolver with the correct Uri from the contract class
+            Cursor cursor = resolver.query(RecipesContract.RecipeslistEntry.CONTENT_URI,
+                    null, null, null, null);
+            return cursor;
+        }
+
+        // Invoked on UI thread
+        @Override
+        protected void onPostExecute(Cursor cursor) {
+            super.onPostExecute(cursor);
+            // Set the data for MainActivity
+            mData = cursor;
+            // Set the data for the adapter
+            mAdapter.setRecipesCursorData(cursor);
+
+            if (mIdlingResource != null) {
+                mIdlingResource.setIdleState(false);
+            }
+        }
     }
 
 }

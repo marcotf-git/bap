@@ -93,7 +93,7 @@ public class IngredientsActivity extends AppCompatActivity {
         // Create a new IngredientsFragment instance and display it using the FragmentManager
         IngredientsFragment ingredientsFragment = new IngredientsFragment();
         // Set the fragment data
-        ingredientsFragment.setIngredients(ingredients);
+        //ingredientsFragment.setIngredients(ingredients);
         // Use a FragmentManager and transaction to add the fragment to the screen
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()

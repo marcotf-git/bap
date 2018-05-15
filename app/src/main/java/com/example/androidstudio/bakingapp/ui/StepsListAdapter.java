@@ -1,7 +1,6 @@
 package com.example.androidstudio.bakingapp.ui;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,48 +10,48 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
-import com.example.androidstudio.bakingapp.data.Recipe;
 import com.example.androidstudio.bakingapp.data.RecipesBox;
-import com.example.androidstudio.bakingapp.data.RecipesContract;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.RecipeViewHolder>{
+public class StepsListAdapter extends RecyclerView.Adapter<StepsListAdapter.StepViewHolder> {
 
 
-    private static final String TAG = RecipesListAdapter.class.getSimpleName();
+    private static final String TAG = StepsListAdapter.class.getSimpleName();
 
     // Store the count of items to be displayed in the recycler view
     private static int viewHolderCount;
 
     // Store the data to be displayed
-    private Cursor recipesCursor;
+    private JSONArray stepsArray;
+    private String stepsJSONString;
 
     /**
      * An on-click handler that we've defined to make it easy for an Activity to interface with
      * our RecyclerView
      */
-    final private ListItemClickListener mOnClickListener;
+    final private StepsListAdapter.ListItemClickListener mOnClickListener;
 
     /**
      * The interface that receives onClick messages and is implemented in MainActivity (communicates
      * with the MainActivity).
      */
     public interface ListItemClickListener {
-        void onListItemClick(int clickedItemIndex,
-                             String recipeName,
-                             String ingredientsJSONString,
-                             String stepsJSONString,
-                             int servings);
+        void onListItemClick(
+                int stepId,
+                String shortDescription,
+                String description,
+                String videoURL,
+                String thumbnailURL,
+                String stepsJSONString);
     }
 
     /**
@@ -61,14 +60,22 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      *
      * @param listener Listener for list item clicks
      */
-    RecipesListAdapter(ListItemClickListener listener) {
+    StepsListAdapter(StepsListAdapter.ListItemClickListener listener) {
         mOnClickListener = listener;
         viewHolderCount = 0;
     }
 
 
-    void setRecipesCursorData(Cursor cursor){
-        this.recipesCursor = cursor;
+    void setStepsData(String stepsJSONString){
+
+        this.stepsJSONString = stepsJSONString;
+
+        try {
+            stepsArray = new JSONArray(stepsJSONString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         notifyDataSetChanged();
     }
 
@@ -85,16 +92,16 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      * @return A new NumberViewHolder that holds the View for each list item
      */
     @Override
-    public RecipeViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public StepsListAdapter.StepViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
         Context context = viewGroup.getContext();
 
-        int layoutIdForListItem = R.layout.recipe_list_item;
+        int layoutIdForListItem = R.layout.step_list_item;
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
 
         View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
-        RecipeViewHolder viewHolder = new RecipeViewHolder(view);
+        StepsListAdapter.StepViewHolder viewHolder = new StepsListAdapter.StepViewHolder(view);
 
         viewHolderCount++;
         Log.d(TAG, "onCreateViewHolder: number of ViewHolders created: " + viewHolderCount);
@@ -114,53 +121,24 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      * @param position The position of the item within the adapter's data set.
      */
     @Override
-    public void onBindViewHolder(final RecipeViewHolder holder, int position) {
+    public void onBindViewHolder(final StepsListAdapter.StepViewHolder holder, int position) {
 
         Log.d(TAG, "#" + position);
 
+        Integer stepId;
+        String shortDescription;
 
-        if(!recipesCursor.moveToPosition(position))
-            return;
+        try {
+            JSONObject stepJSON = stepsArray.getJSONObject(position);
+            stepId = stepJSON.getInt("id");
+            shortDescription = stepJSON.getString("shortDescription");
 
+            holder.idView.setText(stepId.toString());
+            holder.shortDescriptionTextView.setText(shortDescription);
 
-        String recipeName = recipesCursor.getString(recipesCursor.
-                getColumnIndex(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_NAME));
-        String imageURL = recipesCursor.getString(recipesCursor.
-                getColumnIndex(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_IMAGE));
-
-        if (recipeName != null && !recipeName.equals("")) {
-            holder.recipeTextView.setText(recipeName);
-            holder.recipeTextView.setVisibility(View.VISIBLE);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-
-        Log.v(TAG, "onBindViewHolder imageURL:" + imageURL);
-        Log.v(TAG, "onBindViewHolder recipeName:" + recipeName);
-
-        if (imageURL != null && !imageURL.equals("")) {
-            /*
-             * Use the call back of picasso to manage the error in loading poster.
-             * On error, write the message in the text view that is together with the
-             * image view, and make it visible.
-             */
-            Picasso.with(holder.context)
-                    .load(imageURL)
-                    .into(holder.recipeImageView, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.v(TAG, "Recipe image loaded.");
-                            holder.errorTextView.setVisibility(View.INVISIBLE);
-                        }
-
-                        @Override
-                        public void onError() {
-                            Log.e(TAG, "Error in loading recipe image.");
-                            holder.errorTextView.setVisibility(View.VISIBLE);
-                        }
-                    });
-        } else {
-            holder.errorTextView.setVisibility(View.VISIBLE);
-        }
-
     }
 
 
@@ -173,23 +151,21 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
     @Override
     public int getItemCount() {
 
-        if (null != recipesCursor) {
-            return recipesCursor.getCount();
-        } else {
-            return 0;
-        }
+        if (null == stepsArray) return 0;
+        return stepsArray.length();
+
     }
 
 
     /**
      * Cache of the children views for a list item.
      */
-    class RecipeViewHolder extends RecyclerView.ViewHolder
+    class StepViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
-        @BindView(R.id.iv_main_recipe_image) ImageView recipeImageView;
-        @BindView(R.id.tv_main_recipe_name) TextView recipeTextView;
-        @BindView(R.id.tv_recipe_image_error_message_label) TextView errorTextView;
+        @BindView(R.id.tv_step_id) TextView idView;
+        @BindView(R.id.tv_step_short_description) TextView shortDescriptionTextView;
+
         Context context;
 
         /**
@@ -199,7 +175,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
          * @param itemView The View that you inflated in
          *                 {@link RecipesListAdapter#onCreateViewHolder(ViewGroup, int)}
          */
-        private RecipeViewHolder(View itemView) {
+        private StepViewHolder(View itemView) {
 
             super(itemView);
 
@@ -218,32 +194,38 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         @Override
         public void onClick(View v) {
 
-            int clickedItemIndex = getAdapterPosition();
+            int clickedPosition = getAdapterPosition();
 
-            if(!recipesCursor.moveToPosition(clickedItemIndex))
-                return;
+            int stepId;
+            String shortDescription;
+            String description;
+            String videoURL;
+            String thumbnailURL;
 
-            String recipeName = recipesCursor.getString(recipesCursor.
-                    getColumnIndex(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_NAME));
+            try {
 
-            String ingredientsJSONString = recipesCursor.getString(recipesCursor.
-                    getColumnIndex(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_INGREDIENTS_JSON));
+                JSONObject stepJSON = stepsArray.getJSONObject(clickedPosition);
 
-            String stepsJSONString = recipesCursor.getString(recipesCursor.
-                    getColumnIndex(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_STEPS_JSON));
+                stepId = stepJSON.getInt("id");
+                shortDescription = stepJSON.getString("shortDescription");
+                description = stepJSON.getString("description");
+                videoURL = stepJSON.getString("videoURL");
+                thumbnailURL = stepJSON.getString("thumbnailURL");
 
-            int servings = recipesCursor.getInt(recipesCursor.
-                    getColumnIndex(RecipesContract.RecipeslistEntry.COLUMN_RECIPE_SERVINGS));
+                Log.v(TAG, "onClick stepJSON:" + stepJSON.toString());
 
-            Log.v(TAG, "onClick recipeName:" + recipeName);
+                // Calls the method implemented in the main activity
+                mOnClickListener.onListItemClick(
+                        stepId,
+                        shortDescription,
+                        description,
+                        videoURL,
+                        thumbnailURL,
+                        stepsJSONString);
 
-            // Calls the method implemented in the main activity
-            mOnClickListener.onListItemClick(
-                    clickedItemIndex,
-                    recipeName,
-                    ingredientsJSONString,
-                    stepsJSONString,
-                    servings);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
         }
 

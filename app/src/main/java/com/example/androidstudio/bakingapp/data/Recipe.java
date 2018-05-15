@@ -1,6 +1,8 @@
 package com.example.androidstudio.bakingapp.data;
 
 import java.util.List;
+
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -84,4 +86,15 @@ public class Recipe {
                 ", image='" + image + '\'' +
                 '}';
     }
+
+    public String getIngredientsJSONString() {
+        String ingredientsJSONString = new Gson().toJson(ingredients);
+        return ingredientsJSONString;
+    }
+
+    public String getStepsJSONString() {
+        String stepsJSONString = new Gson().toJson(steps);
+        return stepsJSONString;
+    }
+
 }

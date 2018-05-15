@@ -38,27 +38,25 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     // Final string to store state information
     public static final String STEP_NUMBER = "step";
+    public static final String CLICKED_ITEM_INDEX = "clickedItemIndex";
+    public static final String RECIPE_NAME = "recipeName";
+    public static final String INGREDIENTS_JSON_STRING = "ingredientsJSONString";
+    public static final String STEPS_JSON_STRING = "stepsJSONString";
+    public static final String SERVINGS = "servings";
 
     // Final strings to store views visibility state
     public static final String PLAYER_VIEW_VISIBILITY = "player_view_visibility";
     public static final String THUMBNAIL_VIEW_VISIBILITY = "thumbnail_view_visibility";
     public static final String ERROR_VIEW_VISIBILITY = "error_view_visibility";
 
-    // The data vars of the recipe being viewed
-    private String recipeStringJSON;
+
+    private int clickedItemIndex;
     private String recipeName;
+    private String ingredientsJSONString;
+    private String stepsJSONString;
+    private int servings;
 
-    // The data vars of the step being viewed
     private int mStep;
-    private JSONArray ingredientsJSON;
-    private JSONArray stepsJSON;
-
-
-    // The array for storing information about the ingredients
-    private final ArrayList<Ingredient> ingredients = new ArrayList<>();
-
-    // The array for storing information about the steps
-    private final ArrayList<Step> steps = new ArrayList<>();
 
     // A single-pane display refers to phone screens, and two-pane to tablet screens
     private boolean mTwoPane;
@@ -75,20 +73,11 @@ public class RecipeDetailActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
 
-
         ButterKnife.bind(this);
 
         // Determine if you are creating a two-pane or single-pane display
         // This LinearLayout will only initially exists in the two-pane tablet case
         mTwoPane = findViewById(R.id.view_tablet_linear_layout) != null;
-
-        // Reload the number of the step that was being viewed, in case of device rotating
-        if (savedInstanceState == null) {
-            mStep = 0;
-        } else {
-            mStep = savedInstanceState.getInt(STEP_NUMBER);
-        }
-
 
         // Recover the views state in case of device rotating
         if (savedInstanceState != null && mTwoPane) {
@@ -98,142 +87,73 @@ public class RecipeDetailActivity extends AppCompatActivity
         }
 
         // Initialize the data vars for this class
-        // This loads the recipes JSON string, with all the data about the recipes
-        Intent intentThatStartedThisActivity = getIntent();
-        if (intentThatStartedThisActivity.hasExtra("recipeStringJSON")) {
-            recipeStringJSON = intentThatStartedThisActivity.getStringExtra("recipeStringJSON");
+        if (null != savedInstanceState) {
+
+            // Reload the number of the step that was being viewed, in case of device rotating
+            mStep = savedInstanceState.getInt(STEP_NUMBER);
+
+            clickedItemIndex = savedInstanceState.getInt(CLICKED_ITEM_INDEX);
+            recipeName = savedInstanceState.getString(RECIPE_NAME);
+            ingredientsJSONString = savedInstanceState.getString(INGREDIENTS_JSON_STRING);
+            stepsJSONString = savedInstanceState.getString(STEPS_JSON_STRING);
+            servings = savedInstanceState.getInt(SERVINGS);
+
+        } else {
+
+            mStep = 0;
+
+            Intent intentThatStartedThisActivity = getIntent();
+
+            clickedItemIndex = intentThatStartedThisActivity.getIntExtra("clickedItemIndex", -1);
+            recipeName = intentThatStartedThisActivity.getStringExtra("recipeName");
+            ingredientsJSONString = intentThatStartedThisActivity.getStringExtra("ingredientsJSONString");
+            stepsJSONString = intentThatStartedThisActivity.getStringExtra("stepsJSONString");
+            servings = intentThatStartedThisActivity.getIntExtra("servings", -1);
         }
+
+        Log.v(TAG, "onCreate recipeName:" + recipeName);
+        Log.v(TAG, "onCreate ingredientsJSONString:" + ingredientsJSONString);
+        Log.v(TAG, "onCreate stepsJSONString:" + stepsJSONString);
+
 
         // Render the views with the data vars
-        updateView(recipeStringJSON, savedInstanceState);
+        mDisplayName.setText(recipeName);
 
-    }
+        if (savedInstanceState == null) {
 
+            /*
+             * Create a new IngredientsFragment
+             */
+            IngredientsFragment ingredientsFragment = new IngredientsFragment();
+            // Set the fragment data
+            ingredientsFragment.setIngredients(ingredientsJSONString);
+            // Use a FragmentManager and transaction to add the fragment to the screen
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.ingredients_container, ingredientsFragment)
+                    .commit();
 
-    // This will render the views with the data vars
-    public void updateView(String recipeStringJSON, Bundle savedInstanceState){
-
-        // Prepare the data and render the views
-        try {
-
-            // Convert the string to the JSON object
-            JSONObject recipeJSON = new JSONObject(recipeStringJSON);
-
-            // Extract the recipe name
-            recipeName = recipeJSON.getString("name");
-            // Extract the ingredients
-            ingredientsJSON = recipeJSON.getJSONArray("ingredients");
-            // Extract the steps
-            stepsJSON = recipeJSON.getJSONArray("steps");
-
-            // Render the views
-            mDisplayName.setText(recipeName);
-            updateIngredientsView(ingredientsJSON);
-            updateStepsView(stepsJSON, savedInstanceState);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+            /*
+             * Create a new StepsFragment
+             */
+            StepsFragment stepsFragment = new StepsFragment();
+            // Set the fragment data
+            stepsFragment.setSteps(stepsJSONString);
+            // Use a FragmentManager and transaction to add the fragment to the screen
+            FragmentManager stepsFragmentManager = getSupportFragmentManager();
+            stepsFragmentManager.beginTransaction()
+                    .replace(R.id.steps_container, stepsFragment)
+                    .commit();
         }
-
-    }
-
-    /**
-     * This helper function will load the IngredientsFragment, to show the ingredients in a view list.
-     */
-    public void updateIngredientsView (JSONArray ingredientsJSON) {
-
-        Log.v(TAG, "updateIngredientsView ingredientsJSON:" + ingredientsJSON.toString());
-
-        int nIngredients = ingredientsJSON.length();
-
-        // Create an ArrayList with the ingredients for the recipe
-        for (int i = 0; i < nIngredients; i++) {
-
-            int ingredientQuantity;
-            String ingredientMeasure;
-            String ingredientName;
-            JSONObject jsonObject;
-
-            try {
-                jsonObject = ingredientsJSON.getJSONObject(i);
-                ingredientQuantity = jsonObject.getInt("quantity");
-                ingredientMeasure = jsonObject.getString("measure");
-                ingredientName = jsonObject.getString("ingredient");
-                //Ingredient ingredient = new Ingredient(ingredientQuantity, ingredientMeasure, ingredientName);
-                //ingredients.add(ingredient);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        // At this point, we have an Array with the ingredients information
-        Log.v(TAG, "updateIngredientsView ingredients:" + ingredients.toString());
-
-        // Create a new IngredientsFragment instance and display it using the FragmentManager
-        IngredientsFragment ingredientsFragment = new IngredientsFragment();
-        // Set the fragment data
-        ingredientsFragment.setIngredients(ingredients);
-        // Use a FragmentManager and transaction to add the fragment to the screen
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.ingredients_container, ingredientsFragment)
-                .commit();
-    }
-
-
-    /**
-     * This helper function will load the StepsFragment, to show the steps in a view list.
-     */
-    public void updateStepsView (JSONArray stepsJSON, Bundle savedInstanceState) {
-
-        Log.v(TAG, "updateStepsView stepsJSON:" + stepsJSON.toString());
-
-        int nSteps = stepsJSON.length();
-
-        // Create an ArrayList with the ingredients for the recipe
-        for (int i = 0; i < nSteps; i++) {
-
-            int id;
-            String shortDescription;
-            String description;
-            String videoURL;
-            String thumbnailURL;
-            JSONObject jsonObject;
-
-            try {
-                jsonObject = stepsJSON.getJSONObject(i);
-                id = jsonObject.getInt("id");
-                shortDescription = jsonObject.getString("shortDescription");
-                description = jsonObject.getString("description");
-                videoURL = jsonObject.getString("videoURL");
-                thumbnailURL = jsonObject.getString("thumbnailURL");
-                //Step step = new Step(id, shortDescription, description, videoURL, thumbnailURL);
-                //steps.add(step);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        // At this point, we have an Array with the steps information
-        Log.v(TAG, "updateStepsView steps:" + steps.toString());
-
-        // Create a new StepsFragment instance and display it using the FragmentManager
-        StepsFragment stepsFragment = new StepsFragment();
-        // Set the fragment data
-        stepsFragment.setSteps(steps);
-        // Use a FragmentManager and transaction to add the fragment to the screen
-        FragmentManager stepsFragmentManager = getSupportFragmentManager();
-        stepsFragmentManager.beginTransaction()
-                .replace(R.id.steps_container, stepsFragment)
-                .commit();
 
         Log.v(TAG, "updateStepsView mStep:" + mStep);
 
         // If two-pane screen, show also the StepDetailFragment with the initial step
         // and the video of the step
-        if (mTwoPane && savedInstanceState == null) {
-            loadDescriptionAndVideoOrThumbnail(mStep);
-        }
+//        if (mTwoPane && savedInstanceState == null) {
+//            loadDescriptionAndVideoOrThumbnail(mStep);
+//        }
+
     }
 
 
@@ -241,105 +161,112 @@ public class RecipeDetailActivity extends AppCompatActivity
      * Helper method for loading the step description, and also its video or thumbnail
      *
      */
-    private void loadDescriptionAndVideoOrThumbnail (int stepNumber) {
-
-        // Set initial state of the player and thumbnail views (this method is only called in two pane)
-        errorMessageView.setVisibility(View.GONE);
-        mPlayerView.setVisibility(View.GONE);
-        thumbnailView.setVisibility(View.GONE);
-
-        // Remove previously loaded fragments
-        FragmentManager myFragmentManager = getSupportFragmentManager();
-        Fragment fragment = myFragmentManager.findFragmentById(R.id.step_detail_container);
-        if (null != fragment) {
-            myFragmentManager.beginTransaction().remove(fragment).commit();
-        }
-        fragment = myFragmentManager.findFragmentById(R.id.player_container);
-        if (null != fragment) {
-            myFragmentManager.beginTransaction().remove(fragment).commit();
-        }
-
-        // Create a new StepDetailFragment instance and display it using the FragmentManager
-        StepDetailFragment stepDetailFragment = new StepDetailFragment();
-        // Set the fragment data
-        stepDetailFragment.setDescription(steps.get(stepNumber).getDescription());
-        // Use a FragmentManager and transaction to add the fragment to the screen
-        FragmentManager stepFragmentManager = getSupportFragmentManager();
-        stepFragmentManager.beginTransaction()
-                .add(R.id.step_detail_container, stepDetailFragment)
-                .commit();
-
-        // Then, try to load a new one
-        String mStepVideoURL = steps.get(stepNumber).getVideoURL();
-
-        if (mStepVideoURL != null && (!mStepVideoURL.equals(""))) {
-
-            ExoPlayerFragment exoPlayerFragment = new ExoPlayerFragment();
-            // Set the fragment data
-            exoPlayerFragment.setMediaUrl(mStepVideoURL);
-            // Use a FragmentManager and transaction to add the fragment to the screen
-            FragmentManager playerFragmentManager = getSupportFragmentManager();
-            // Use a FragmentManager and transaction to add the fragment to the screen
-            playerFragmentManager.beginTransaction()
-                    .add(R.id.player_container, exoPlayerFragment)
-                    .commit();
-            mPlayerView.setVisibility(View.VISIBLE);
-
-        } else {
-
-            // In case of no video, try to show the thumbnail
-            String mStepThumbnailURL = steps.get(stepNumber).getThumbnailURL();
-
-            if (mStepThumbnailURL != null && (!mStepThumbnailURL.equals(""))) {
-                /*
-                 * Use the call back of picasso to manage the error in loading thumbnail.
-                 */
-                Picasso.with(this)
-                        .load(mStepThumbnailURL)
-                        .into(thumbnailView, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                Log.v(TAG, "Thumbnail loaded");
-                                thumbnailView.setVisibility(View.VISIBLE);
-                            }
-
-                            @Override
-                            public void onError() {
-                                Log.e(TAG, "Error in loading thumbnail");
-                                if (mPlayerView.getVisibility() == GONE) {
-                                    errorMessageView.setVisibility(View.VISIBLE);
-                                }
-                            }
-                        });
-            }  else {
-                errorMessageView.setVisibility(View.VISIBLE);
-            }
-        }
-    }
+//    private void loadDescriptionAndVideoOrThumbnail (int stepNumber) {
+////
+////        // Set initial state of the player and thumbnail views (this method is only called in two pane)
+////        errorMessageView.setVisibility(View.GONE);
+////        mPlayerView.setVisibility(View.GONE);
+////        thumbnailView.setVisibility(View.GONE);
+////
+////        // Remove previously loaded fragments
+////        FragmentManager myFragmentManager = getSupportFragmentManager();
+////        Fragment fragment = myFragmentManager.findFragmentById(R.id.step_detail_container);
+////        if (null != fragment) {
+////            myFragmentManager.beginTransaction().remove(fragment).commit();
+////        }
+////        fragment = myFragmentManager.findFragmentById(R.id.player_container);
+////        if (null != fragment) {
+////            myFragmentManager.beginTransaction().remove(fragment).commit();
+////        }
+////
+////        // Create a new StepDetailFragment instance and display it using the FragmentManager
+////        StepDetailFragment stepDetailFragment = new StepDetailFragment();
+////        // Set the fragment data
+////        stepDetailFragment.setDescription(steps.get(stepNumber).getDescription());
+////        // Use a FragmentManager and transaction to add the fragment to the screen
+////        FragmentManager stepFragmentManager = getSupportFragmentManager();
+////        stepFragmentManager.beginTransaction()
+////                .add(R.id.step_detail_container, stepDetailFragment)
+////                .commit();
+////
+////        // Then, try to load a new one
+////        String mStepVideoURL = steps.get(stepNumber).getVideoURL();
+////
+////        if (mStepVideoURL != null && (!mStepVideoURL.equals(""))) {
+////
+////            ExoPlayerFragment exoPlayerFragment = new ExoPlayerFragment();
+////            // Set the fragment data
+////            exoPlayerFragment.setMediaUrl(mStepVideoURL);
+////            // Use a FragmentManager and transaction to add the fragment to the screen
+////            FragmentManager playerFragmentManager = getSupportFragmentManager();
+////            // Use a FragmentManager and transaction to add the fragment to the screen
+////            playerFragmentManager.beginTransaction()
+////                    .add(R.id.player_container, exoPlayerFragment)
+////                    .commit();
+////            mPlayerView.setVisibility(View.VISIBLE);
+////
+////        } else {
+////
+////            // In case of no video, try to show the thumbnail
+////            String mStepThumbnailURL = steps.get(stepNumber).getThumbnailURL();
+////
+////            if (mStepThumbnailURL != null && (!mStepThumbnailURL.equals(""))) {
+////                /*
+////                 * Use the call back of picasso to manage the error in loading thumbnail.
+////                 */
+////                Picasso.with(this)
+////                        .load(mStepThumbnailURL)
+////                        .into(thumbnailView, new Callback() {
+////                            @Override
+////                            public void onSuccess() {
+////                                Log.v(TAG, "Thumbnail loaded");
+////                                thumbnailView.setVisibility(View.VISIBLE);
+////                            }
+////
+////                            @Override
+////                            public void onError() {
+////                                Log.e(TAG, "Error in loading thumbnail");
+////                                if (mPlayerView.getVisibility() == GONE) {
+////                                    errorMessageView.setVisibility(View.VISIBLE);
+////                                }
+////                            }
+////                        });
+////            }  else {
+////                errorMessageView.setVisibility(View.VISIBLE);
+////            }
+////        }
+////    }
 
 
     /**
      * This is the listener that receives communication from the StepsFragment
      */
     @Override
-    public void onStepSelected(int position) {
+    public void onStepSelected(int stepId,
+                               String shortDescription,
+                               String description,
+                               String videoURL,
+                               String thumbnailURL,
+                               String stepsJSONString) {
 
-        Log.v(TAG, "onStepSelected:" + position);
+        Log.v(TAG, "onStepSelected stepId:" + stepId);
 
-        mStep = position;
         Context context = RecipeDetailActivity.this;
 
         if (!mTwoPane) {
             // If one-pane screen, call the StepDetailActivity to show the step detail
             Class destinationActivity = StepDetailActivity.class;
             Intent startChildActivityIntent = new Intent(context, destinationActivity);
-            startChildActivityIntent.putExtra("mStep", mStep);
-            startChildActivityIntent.putExtra("stepsJSONtoString", stepsJSON.toString());
+            startChildActivityIntent.putExtra("id", stepId);
+            startChildActivityIntent.putExtra("description", description);
+            startChildActivityIntent.putExtra("videoURL", videoURL);
+            startChildActivityIntent.putExtra("thumbnailURL", thumbnailURL);
+            startChildActivityIntent.putExtra("stepsJSONString", stepsJSONString);
             startActivity(startChildActivityIntent);
         } else {
             // If two-pane screen, show also the StepDetailFragment with the initial step
             // and the video of the step
-            loadDescriptionAndVideoOrThumbnail(mStep);
+            //loadDescriptionAndVideoOrThumbnail(mStep);
         }
     }
 
@@ -347,7 +274,15 @@ public class RecipeDetailActivity extends AppCompatActivity
     // This method is saving the step being viewed
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
+
         savedInstanceState.putInt(STEP_NUMBER, mStep);
+
+        savedInstanceState.putInt(CLICKED_ITEM_INDEX, clickedItemIndex);
+        savedInstanceState.putString(RECIPE_NAME, recipeName);
+        savedInstanceState.putString(INGREDIENTS_JSON_STRING, ingredientsJSONString);
+        savedInstanceState.putString(STEPS_JSON_STRING, stepsJSONString);
+        savedInstanceState.putInt(SERVINGS, servings);
+
         if(mTwoPane) {
             savedInstanceState.putInt(PLAYER_VIEW_VISIBILITY, mPlayerView.getVisibility());
             savedInstanceState.putInt(THUMBNAIL_VIEW_VISIBILITY, thumbnailView.getVisibility());

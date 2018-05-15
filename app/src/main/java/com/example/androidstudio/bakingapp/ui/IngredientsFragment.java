@@ -3,25 +3,26 @@ package com.example.androidstudio.bakingapp.ui;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import com.example.androidstudio.bakingapp.R;
-import com.example.androidstudio.bakingapp.data.Ingredient;
-
-import java.util.ArrayList;
 
 
 public class IngredientsFragment extends Fragment {
 
     private static final String TAG = IngredientsFragment.class.getSimpleName();
 
+    public static final String INGREDIENTS_JSON_STRING = "ingredientsJSONString";
+
     // Variables to store resources that this fragment displays
-    // The array for storing information about the ingredients
-    private final ArrayList<Ingredient> mIngredients = new ArrayList<>();
+    private String ingredientsJSONString;
+
+    private IngredientsListAdapter mAdapter;
+
 
     // Mandatory constructor for instantiating the fragment
     public IngredientsFragment() {
@@ -37,29 +38,38 @@ public class IngredientsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_ingredients, container, false);
 
         // Get a reference to the ingredients list
-        ListView listView = rootView.findViewById(R.id.ingredients_list);
+        RecyclerView mIngredientsList = rootView.findViewById(R.id.ingredients_list);
+
+        // Set the layout manager
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        mIngredientsList.setLayoutManager(layoutManager);
+        mIngredientsList.setHasFixedSize(true);
 
         // Set the data to display
-        IngredientAdapter ingredientAdapter = new IngredientAdapter(getContext(), mIngredients);
-        listView.setAdapter(ingredientAdapter);
+        mAdapter = new IngredientsListAdapter();
+        mIngredientsList.setAdapter(mAdapter);
 
-        // Adjust the size of the list view to show all the ingredients
-        float listItemHeight = getResources().getDimension(R.dimen.ingredient_list_item_height);
-        float listItemPadding = getResources().getDimension(R.dimen.list_padding);
-        Log.v(TAG, " list item height:" + listItemHeight);
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        int totalHeight = Math.round((listItemHeight * mIngredients.size())+ listItemPadding);
-        params.height = totalHeight;
-        Log.v(TAG, " total list item height:" + totalHeight);
-        listView.setLayoutParams(params);
+        if(savedInstanceState != null){
+            ingredientsJSONString = savedInstanceState.getString(INGREDIENTS_JSON_STRING);
+        }
+
+        mAdapter.setIngredientsData(ingredientsJSONString);
 
         // Return root view
         return rootView;
 
     }
 
-    public void setIngredients(ArrayList<Ingredient> ingredients) {
-        mIngredients.addAll(ingredients);
+    public void setIngredients(String ingredientsJSONString) {
+        this.ingredientsJSONString = ingredientsJSONString;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+
+        savedInstanceState.putString(INGREDIENTS_JSON_STRING, ingredientsJSONString);
+
+        super.onSaveInstanceState(savedInstanceState);
     }
 
 }

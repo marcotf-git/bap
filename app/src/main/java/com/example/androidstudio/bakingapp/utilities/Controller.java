@@ -1,8 +1,11 @@
 package com.example.androidstudio.bakingapp.utilities;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.example.androidstudio.bakingapp.data.Recipe;
+import com.example.androidstudio.bakingapp.data.RecipesBox;
+import com.example.androidstudio.bakingapp.ui.MainActivity;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -20,7 +23,22 @@ public class Controller implements Callback<List<Recipe>> {
     private static final String TAG = Controller.class.getSimpleName();
     static final String BASE_URL = "https://go.udacity.com/";
 
-    public void start() {
+    OnDataLoadedListener mCallback;
+
+    public interface OnDataLoadedListener {
+        void onDataLoaded(List<Recipe> recipes);
+    }
+
+
+
+    public void start(Context context) {
+
+        try{
+            mCallback = (OnDataLoadedListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement OnDataLoadedListener");
+        }
+
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
@@ -40,11 +58,14 @@ public class Controller implements Callback<List<Recipe>> {
     @Override
     public void onResponse(Call<List<Recipe>> call, Response<List<Recipe>> response) {
         if(response.isSuccessful()) {
+
             List<Recipe> recipesList = response.body();
 
-            for(Recipe recipe: recipesList) {
-                Log.v(TAG, "onResponse:" + recipe.toString());
-            }
+//            for(Recipe recipe: recipesList) {
+//                Log.v(TAG, "onResponse recipe names:" + recipe.getName());
+//            }
+
+            mCallback.onDataLoaded(recipesList);
 
         } else {
             Log.e(TAG, "onResponse:" + response.errorBody());
