@@ -8,35 +8,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.example.androidstudio.bakingapp.R;
-import com.example.androidstudio.bakingapp.ui.IngredientsActivity;
 import com.example.androidstudio.bakingapp.ui.MainActivity;
 
 /**
  * Implementation of App Widget functionality.
  */
-public class IngredientsWidget extends AppWidgetProvider {
+public class IngredientsWidgetProvider extends AppWidgetProvider {
+
+    private static final String TAG = IngredientsWidgetProvider.class.getSimpleName();
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
+                                String recipeName, int appWidgetId) {
+
+        Log.d(TAG, "updateAppWidget ");
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_ingredients);
-//        views.setTextViewText(R.id.appwidget_text, widgetText);
-
-        /*
-         * Set the IngredientsActivity intent to launch when clicked.
-         * This is the template that will be completed in the WidgetDataProvider getViewAt method
-         * with the specific data for the item.
-         */
-        Intent appIntent = new Intent(context, IngredientsActivity.class);
-        PendingIntent appPendingIntent = PendingIntent.getActivity(
-                context,
-                0,
-                appIntent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-        views.setPendingIntentTemplate(R.id.widget_list, appPendingIntent);
+        views.setTextViewText(R.id.tv_widget_recipe_name, recipeName);
 
         // Set the widget title to launch the MainActivity
         Intent appMainIntent = new Intent(context, MainActivity.class);
@@ -48,7 +39,7 @@ public class IngredientsWidget extends AppWidgetProvider {
         views.setOnClickPendingIntent(R.id.tv_widget_title, appMainPendingIntent);
 
         // Set up the collection
-        // Set the WidgetService intent to act as the adapter for the list view
+        // Set the ListWidgetService intent to act as the adapter for the list view
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             setRemoteAdapter(context, views);
         } else {
@@ -60,10 +51,6 @@ public class IngredientsWidget extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // There may be multiple widgets active, so update all of them
-        for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId);
-        }
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
@@ -85,7 +72,7 @@ public class IngredientsWidget extends AppWidgetProvider {
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private static void setRemoteAdapter(Context context, @NonNull final RemoteViews views) {
         views.setRemoteAdapter(R.id.widget_list,
-                new Intent(context, WidgetService.class));
+                new Intent(context, ListWidgetService.class));
     }
 
     /**
@@ -96,7 +83,15 @@ public class IngredientsWidget extends AppWidgetProvider {
     @SuppressWarnings("deprecation")
     private static void setRemoteAdapterV11(Context context, @NonNull final RemoteViews views) {
         views.setRemoteAdapter(0, R.id.widget_list,
-                new Intent(context, WidgetService.class));
+                new Intent(context, ListWidgetService.class));
+    }
+
+
+    public static void updateIngredientsWidgets(Context context, AppWidgetManager appWidgetManager,
+                                                String recipeName, int[] appWidgetIds) {
+        for (int appWidgetId : appWidgetIds) {
+            updateAppWidget(context, appWidgetManager, recipeName, appWidgetId);
+        }
     }
 
 }

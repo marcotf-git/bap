@@ -25,10 +25,16 @@ public class IngredientsFragment extends Fragment {
 
     private IngredientsListAdapter mAdapter;
 
+//    OnIngredientsLoadedListener widgetCallback;
 
     // Mandatory constructor for instantiating the fragment
     public IngredientsFragment() {
     }
+
+    // Interface for communication with the widget
+//    public interface OnIngredientsLoadedListener {
+//        void onIngredientsLoaded(String ingredientsJSONString);
+//    }
 
     /**
      * Inflates the fragment layout and sets any view resources
@@ -65,6 +71,7 @@ public class IngredientsFragment extends Fragment {
 
     public void setIngredients(String ingredientsJSONString) {
         this.ingredientsJSONString = ingredientsJSONString;
+//        widgetCallback.onIngredientsLoaded(ingredientsJSONString);
     }
 
     @Override

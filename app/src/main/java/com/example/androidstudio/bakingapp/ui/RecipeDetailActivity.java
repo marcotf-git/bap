@@ -1,5 +1,7 @@
 package com.example.androidstudio.bakingapp.ui;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,17 +15,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
-import com.example.androidstudio.bakingapp.data.Ingredient;
-import com.example.androidstudio.bakingapp.data.RecipesContract;
-import com.example.androidstudio.bakingapp.data.Step;
+import com.example.androidstudio.bakingapp.widget.IngredientsWidgetProvider;
+import com.example.androidstudio.bakingapp.widget.ListRemoteViewsFactory;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -153,6 +152,17 @@ public class RecipeDetailActivity extends AppCompatActivity
             loadDescriptionAndVideoOrThumbnail(mStep);
         }
 
+        //IngredientsBox ingredientsInMemory = new IngredientsBox(ingredientsJSONString);
+
+        ListRemoteViewsFactory.setWidgetProviderData(ingredientsJSONString);
+
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, IngredientsWidgetProvider.class));
+        //Trigger data update to handle the GridView widgets and force a data refresh
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
+        //Now update all widgets
+        IngredientsWidgetProvider.updateIngredientsWidgets(this, appWidgetManager, recipeName, appWidgetIds);
+
     }
 
 
@@ -177,7 +187,6 @@ public class RecipeDetailActivity extends AppCompatActivity
         if (null != fragment) {
             myFragmentManager.beginTransaction().remove(fragment).commit();
         }
-
 
         // Initialize the variables that will be used
         String description = null;

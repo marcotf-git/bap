@@ -46,7 +46,7 @@
         <activity android:name=".ui.IngredientsActivity"/>
 
         <!-- The broadcast receiver that refers to the widget. -->
-        <receiver android:name=".widget.IngredientsWidget">
+        <receiver android:name=".widget.IngredientsWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -58,7 +58,7 @@
 
         <!-- The service that will send the collection data to the widget. -->
         <service
-            android:name=".widget.WidgetService"
+            android:name=".widget.ListWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
     </application>
