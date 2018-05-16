@@ -2,11 +2,11 @@
 
 This project is an exercise as part of the **Android Developer Nanodegree**, by **Udacity**. The app allows a user to select a recipe and see video-guided steps for how to complete it.
 
-The recipes are in a `JSON` format, that contains the recipe's instructions, ingredients, videos and images, stored on a remote server.
+The recipes are in a `JSON` format API endpoint, in a remote server. Each recipe contains the recipe's instructions, ingredients, videos URLs and thumbnails URLs.
 
-The data is queried through internet, with the **Retrofit** library, and saved in the local **SQLite** database. We have implemented the `Content Provider` to handle the database.
+The `JSON` data is queried through internet, with the **Retrofit** library, and saved in the local **SQLite** database. We have implemented the `Content Provider` to handle the database.
 
-After storing the data, the app will query the database, and will work mainly with this data, in the form of strings and `JSON` strings stored in memory and passed though the activities. This makes the database a little redundant, but the database is important for future developments of the app.
+After saving the data, the app will query the database, and will work mainly with this data, converting it in the form of strings and `JSON` strings stored in memory and passed through the activities. This makes the database a little redundant, but the database is important for future developments of the app.
 
 We have used `Fragments` to adapt the screens to the devices, so the same `Fragments` can be reused in different layouts. The communication between `Activities` and `Fragments` was made with the help of `Listeners`. The state of the `Fragments` is saved and reloaded to handle device screen rotation.
 
@@ -26,6 +26,8 @@ We have used the following libraries and technologies:
 **SQLite**  (https://www.sqlite.org/index.html)
 
 **Retrofit** (http://square.github.io/retrofit/)
+
+**Gson** (https://github.com/google/gson)
 
 **ButterKnife** (http://jakewharton.github.io/butterknife/)
 
