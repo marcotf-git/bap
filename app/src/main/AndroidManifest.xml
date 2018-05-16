@@ -44,8 +44,6 @@
                 android:value=".ui.RecipeDetailActivity"/>
         </activity>
 
-        <activity android:name=".ui.IngredientsActivity"/>
-
         <!-- The broadcast receiver that refers to the widget. -->
         <receiver android:name=".widget.IngredientsWidgetProvider">
             <intent-filter>

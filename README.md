@@ -12,6 +12,8 @@ We have used `Fragments` to adapt the screens to the devices, so the same `Fragm
 
 The movies and thumbnails are fetched with the **ExoPlayer** and **Picasso** libraries. We have set a `Fragment` exclusively for one **ExoPlayer** `container`.  The app is able to handle some errors, like when there is no internet response or when the data is incomplete, showing some error messages.
 
+It is also possible to load the data from a `JSON` local file, in the `Assets` folder, because we have made a modification to the `Controller.java` used for the **Retrofit** loading. With this modification, is possible to mock some error cases to test the app. Just set the `LOAD_FROM_FILE` member variable in that class. Don't forget to reload the file to the device if you made the modification of the file on your local machine! 🚩
+
 Finally, the app has a `widget` that shows the recipe ingredients for the recipe that was selected in the app. If we close the app, when reading the recipe details screen, the widget will show the ingredients for that recipe. The widget will be cleared if we close the app while not in the recipe detail screen. 🍰
 
 

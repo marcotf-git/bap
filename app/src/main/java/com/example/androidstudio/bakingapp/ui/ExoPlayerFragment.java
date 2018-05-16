@@ -13,10 +13,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -29,6 +32,9 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * This fragment will play the video with Url in mediaUrl variable, using the ExoPlayer library.
@@ -53,6 +59,9 @@ public class ExoPlayerFragment extends Fragment {
     private PlaybackStateCompat.Builder mStateBuilder;
     private boolean isLandscape;
 
+    private TextView errorMessageView;
+    private FrameLayout videoView;
+
     // This variable has a setter method and it is for initializing the fragment
     private String mediaUrl;
 
@@ -65,6 +74,14 @@ public class ExoPlayerFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // These views will handle the error in ExoPlayer loading.
+        // They will change visibility according to the loading status, as commanding by the
+        // onPlayerError method of the ExoPlayer callback listener.
+        if (getActivity() != null) {
+            errorMessageView = getActivity().findViewById(R.id.tv_illustration_not_available_label);
+            videoView = getActivity().findViewById(R.id.player_container);
+        }
 
         componentListener = new ComponentListener();
 
@@ -283,6 +300,17 @@ public class ExoPlayerFragment extends Fragment {
 
     // The Player listener
     private class ComponentListener extends Player.DefaultEventListener{
+
+        @Override
+        public void onPlayerError(ExoPlaybackException error) {
+            super.onPlayerError(error);
+
+            if (videoView != null && errorMessageView != null) {
+                videoView.setVisibility(View.INVISIBLE);
+                errorMessageView.setVisibility(View.VISIBLE);
+            }
+        }
+
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             super.onPlayerStateChanged(playWhenReady, playbackState);

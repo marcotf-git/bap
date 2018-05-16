@@ -33,6 +33,7 @@ public class StepDetailActivity extends AppCompatActivity {
     private static final String PLAYER_VIEW_VISIBILITY = "player_view_visibility";
     private static final String THUMBNAIL_VIEW_VISIBILITY = "thumbnail_view_visibility";
     private static final String ERROR_VIEW_VISIBILITY = "error_view_visibility";
+    private static final String STEP_BEING_VIEWED = "step_being_viewed";
 
     // The data vars of the recipe being viewed
     private String stepsJSONString;
@@ -70,7 +71,13 @@ public class StepDetailActivity extends AppCompatActivity {
 
         Intent intentThatStartedThisActivity = getIntent();
 
-        mStep = intentThatStartedThisActivity.getIntExtra("id", 0);
+        // Recover the actual being viewed step in case of device rotating
+        if (savedInstanceState != null) {
+            mStep = savedInstanceState.getInt(STEP_BEING_VIEWED);
+        } else {
+            mStep = intentThatStartedThisActivity.getIntExtra("id", 0);
+        }
+
         description = intentThatStartedThisActivity.getStringExtra("description");
         videoURL = intentThatStartedThisActivity.getStringExtra("videoURL");
         thumbnailURL = intentThatStartedThisActivity.getStringExtra("thumbnailURL");
@@ -218,7 +225,7 @@ public class StepDetailActivity extends AppCompatActivity {
         outState.putInt(PLAYER_VIEW_VISIBILITY, mPlayerView.getVisibility());
         outState.putInt(THUMBNAIL_VIEW_VISIBILITY, thumbnailView.getVisibility());
         outState.putInt(ERROR_VIEW_VISIBILITY, errorMessageView.getVisibility());
-        outState.putInt("mStep", mStep);
+        outState.putInt(STEP_BEING_VIEWED, mStep);
 
         super.onSaveInstanceState(outState);
     }
