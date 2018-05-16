@@ -34,13 +34,15 @@ public class Controller implements Callback<List<Recipe>> {
     private static final String TAG = Controller.class.getSimpleName();
     private static final String BASE_URL = "https://go.udacity.com/";
 
-    private static final boolean LOAD_FROM_FILE = true;
+    // Set to true if for testing (will load from local file in the Assets folder).
+    private static final boolean LOAD_FROM_FILE = false;
+    private static final String FILE_NAME = "baking.json";
 
     private OnDataLoadedListener mCallback;
 
     private Context mContext;
 
-    private List<Recipe> recipesList = null;
+    private static List<Recipe> recipesList = null;
 
 
     public interface OnDataLoadedListener {
@@ -51,10 +53,19 @@ public class Controller implements Callback<List<Recipe>> {
 
         mContext = context;
 
+        Log.v(TAG, "start: recipesList is null?:" + recipesList);
+
         try{
             mCallback = (OnDataLoadedListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + " must implement OnDataLoadedListener");
+        }
+
+        // Do not load if already loaded
+        if (recipesList != null) {
+            // Call the Controller callback
+            mCallback.onDataLoaded(recipesList);
+            return;
         }
 
         Gson gson = new GsonBuilder()
@@ -71,18 +82,21 @@ public class Controller implements Callback<List<Recipe>> {
         Call<List<Recipe>> call = recipesAPI.loadChanges("status:open");
         call.enqueue(this);
 
+        Log.v(TAG, "start: loading from web");
+
     }
 
     @Override
     public void onResponse(@NonNull Call<List<Recipe>> call, @NonNull Response<List<Recipe>> response) {
 
+        Log.v(TAG, "onResponse: end loading from web");
+
         if(response.isSuccessful()) {
 
             recipesList = response.body();
 
-            // Will swap the recipesList if LOAD_FROM_FILE == true
-            String fileName = "baking.json";
-            new FileQueryTask().execute(fileName);
+            // Will swap the recipesList if LOAD_FROM_FILE is true
+            new FileQueryTask().execute(FILE_NAME);
 
             //mCallback.onDataLoaded(recipesList);
 
@@ -93,6 +107,9 @@ public class Controller implements Callback<List<Recipe>> {
 
     @Override
     public void onFailure(@NonNull Call<List<Recipe>> call, @NonNull Throwable t) {
+
+        Log.v(TAG, "onFailure loading");
+        Toast.makeText(mContext, "Error in loading.", LENGTH_LONG).show();
 
         t.printStackTrace();
 
@@ -149,6 +166,13 @@ public class Controller implements Callback<List<Recipe>> {
             mCallback.onDataLoaded(recipesList);
 
         }
+    }
+
+    public static void clearRecipesList() {
+        if (null != recipesList) {
+            recipesList.clear();
+        }
+        recipesList = null;
     }
 
 }

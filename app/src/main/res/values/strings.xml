@@ -10,6 +10,7 @@
     <string name="recipe_name">Recipe Name</string>
     <string name="recipe_image">Recipe Image</string>
     <string name="ingredients">Ingredients</string>
+    <string name="servings">servings</string>
     <string name="steps">Steps</string>
     <string name="step_description">Step Description</string>
     <string name="thumbnail_image">Thumbnail Image</string>
@@ -22,5 +23,6 @@
     <string name="recipe_detail_activity_label">Recipe Details</string>
     <string name="step_details_activity_label">Step Details</string>
     <string name="menu_action_refresh_label">Refresh</string>
+    <string name="hint_servings_label">8 servings</string>
 
 </resources>

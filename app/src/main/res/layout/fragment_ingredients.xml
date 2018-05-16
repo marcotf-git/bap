@@ -6,12 +6,13 @@
     android:layout_height="wrap_content">
 
     <TextView
+        android:id="@+id/tv_servings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/list_padding"
         android:paddingBottom="@dimen/list_padding"
-        android:text="@string/ingredients"
-        android:textSize="@dimen/text_size_labels"/>
+        android:textSize="@dimen/text_size_labels"
+        android:hint="@string/ingredients"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/ingredients_list"

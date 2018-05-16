@@ -1,6 +1,7 @@
 package com.example.androidstudio.bakingapp.ui;
 
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.androidstudio.bakingapp.R;
 
@@ -19,9 +21,11 @@ public class IngredientsFragment extends Fragment {
     private static final String TAG = IngredientsFragment.class.getSimpleName();
 
     private static final String INGREDIENTS_JSON_STRING = "ingredientsJSONString";
+    private static final String SERVINGS = "servings";
 
     // Variables to store resources that this fragment displays
     private String ingredientsJSONString;
+    private Integer servings;
 
     private IngredientsListAdapter mAdapter;
 
@@ -59,7 +63,19 @@ public class IngredientsFragment extends Fragment {
         mAdapter = new IngredientsListAdapter();
         if(savedInstanceState != null){
             ingredientsJSONString = savedInstanceState.getString(INGREDIENTS_JSON_STRING);
+            servings = savedInstanceState.getInt(SERVINGS);
         }
+
+        TextView textServings = rootView.findViewById(R.id.tv_servings);
+        if (servings != null) {
+            String ingredientsLabel = getText(R.string.ingredients) + " (" + servings + " " +
+                    getText(R.string.servings) + ")";
+            textServings.setText(ingredientsLabel);
+        } else {
+            String ingredientsLabel = getText(R.string.ingredients) + "";
+            textServings.setText(ingredientsLabel);
+        }
+
         mAdapter.setIngredientsData(ingredientsJSONString);
 
         mIngredientsList.setAdapter(mAdapter);
@@ -69,8 +85,9 @@ public class IngredientsFragment extends Fragment {
 
     }
 
-    public void setIngredients(String ingredientsJSONString) {
+    public void setIngredients(String ingredientsJSONString, Integer servings) {
         this.ingredientsJSONString = ingredientsJSONString;
+        this.servings = servings;
 //        widgetCallback.onIngredientsLoaded(ingredientsJSONString);
     }
 
@@ -78,6 +95,7 @@ public class IngredientsFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
 
         savedInstanceState.putString(INGREDIENTS_JSON_STRING, ingredientsJSONString);
+        savedInstanceState.putInt(SERVINGS, servings);
 
         super.onSaveInstanceState(savedInstanceState);
     }

@@ -30,11 +30,14 @@
             android:hint="@string/recipe_name" />
 
         <!-- The container for the ingredients fragment -->
+
         <FrameLayout
             android:id="@+id/ingredients_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp">
+
+        </FrameLayout>
 
         <!-- The container for the steps fragment -->
         <FrameLayout

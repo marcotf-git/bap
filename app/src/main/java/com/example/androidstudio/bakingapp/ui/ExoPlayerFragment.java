@@ -76,7 +76,7 @@ public class ExoPlayerFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         // These views will handle the error in ExoPlayer loading.
-        // They will change visibility according to the loading status, as commanding by the
+        // They will change visibility, according to the loading status, as commanded by the
         // onPlayerError method of the ExoPlayer callback listener.
         if (getActivity() != null) {
             errorMessageView = getActivity().findViewById(R.id.tv_illustration_not_available_label);
@@ -306,7 +306,7 @@ public class ExoPlayerFragment extends Fragment {
             super.onPlayerError(error);
 
             if (videoView != null && errorMessageView != null) {
-                videoView.setVisibility(View.INVISIBLE);
+                videoView.setVisibility(View.GONE);
                 errorMessageView.setVisibility(View.VISIBLE);
             }
         }

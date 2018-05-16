@@ -128,7 +128,7 @@ public class RecipeDetailActivity extends AppCompatActivity
              */
             IngredientsFragment ingredientsFragment = new IngredientsFragment();
             // Set the fragment data
-            ingredientsFragment.setIngredients(ingredientsJSONString);
+            ingredientsFragment.setIngredients(ingredientsJSONString, servings);
             // Use a FragmentManager and transaction to add the fragment to the screen
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()

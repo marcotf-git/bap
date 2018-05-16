@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final int ID_RECIPES_LOADER = 44;
 
-
     // The Idling Resource which will be null in production.
     @Nullable
     private SimpleIdlingResource mIdlingResource;
@@ -398,6 +397,7 @@ public class MainActivity extends AppCompatActivity implements
 
     // Reload the activity
     private void refreshActivity() {
+        Controller.clearRecipesList();
         finish();
         startActivity(getIntent());
     }
